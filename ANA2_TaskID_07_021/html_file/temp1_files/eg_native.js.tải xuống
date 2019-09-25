@@ -1,0 +1,26 @@
+console.log('eg_native');
+
+(function () {
+    var pathname = location.href;
+
+    // if (pathname.match(/japanese.engadget.com\/$/)) {
+        var adUnitId = "";
+        if ((navigator.userAgent.indexOf('iPhone') > 0 && navigator.userAgent.indexOf('iPad') == -1) || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) {
+            adUnitId = "ddcb034c-f1d9-4f9b-a715-c9a9fcbf2b1a";   //Device: SPの場合
+        } else {
+            adUnitId = "c82487c9-677f-45ac-af66-e9dae911fca1";
+        }
+        window.native = window.native || [];
+        window.native.push(adUnitId);
+        window.apiKey = "RFPGSQXQRZGPVCKJ23HY";
+
+        (function (d) {
+            var script = d.createElement("script");
+            script.async = true;
+            script.src = "https://s.yimg.com/dy/ads/native.js";
+            d.body.appendChild(script);
+        })(document);
+    // }
+    // if (pathname.match(/www.aolp.jp\/test\/akiko_tests\/renewal_engadget_sp.html/)) {
+    // }
+}());

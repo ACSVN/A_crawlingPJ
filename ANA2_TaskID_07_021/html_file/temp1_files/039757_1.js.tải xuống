@@ -1,0 +1,46 @@
+(function () {
+	"use strict";
+	function createScriptTag() {
+		var scriptTag;
+		scriptTag = document.createElement('script');
+		scriptTag.src = 'https://y.one.impact-ad.jp/imp?p=39757&w=300&h=250&t=async';
+		return scriptTag;
+	}
+
+	function insertScript(currentDom) {
+		var	scriptTag, parentDom;
+		scriptTag = createScriptTag();
+		parentDom = currentDom.parentNode;
+		parentDom.insertBefore(scriptTag, currentDom);
+	}
+
+	function FIF() {
+		var iframe = window.frameElement;
+		iframe.style.display = 'none';
+		insertScript(iframe);
+	}
+
+	function notFIF() {
+		var script = document.currentScript || document.getElementsByTagName("script")[document.getElementsByTagName("script").length - 1];
+		insertScript(script);
+	}
+
+	if (window !== parent) {
+		//iframe
+		if (window.$sf) {
+			//safeframe
+			notFIF();
+		} else {
+			try {
+				//friendly iframe
+				FIF();
+			} catch (e) {
+				//cross-domain iframe
+				//do nothing
+			}
+		}
+	} else if (window === parent) {
+		//not iframe
+		notFIF();
+	}
+}());

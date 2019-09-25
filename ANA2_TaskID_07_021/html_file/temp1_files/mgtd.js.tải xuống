@@ -1,0 +1,185 @@
+// td-js-sdk Aone sync
+var gTDConf = {};
+(function() {
+  !function(t,s,o,a){"use strict";var i=function(t){this.version="0.1.7",this.customParam=t.customParam||{},this.idSyncList=t.idSyncList||[],this.table=t.table,this.trackClicks=t.trackClicks||!1,this.trackCrossDomain=t.trackCrossDomain||!1,this.trackFingerprint=t.trackFingerprint||!1,this.trackCookies=t.trackCookies||{},this.id="tdw_"+Math.random().toString(36).substring(7),this.sent=!1,this.tokenIntimateMerger=t.tokenIntimateMerger||void 0,this.tokenAudienceOne=t.tokenAudienceOne||void 0,this.clickTable=t.clickTable||"clicks",this.dmpCb={list:{},funcs:[],cnt:0},this.drawbridgeConf=t.drawbridgeConf||void 0,this.ac=this._getAccountInfo(t.initParams);var e=new s.MG_Treasure(t.initParams);if(e.set("$global",this.customParam),this.trackClicks&&e.trackClicks({tableName:this.clickTable}),this.trackCrossDomain&&e.set("$global","td_global_id","td_global_id"),0<Object.keys(this.trackCookies).length){var n=this;Object.keys(this.trackCookies).forEach(function(t){var i=n._getCookie(t.toString());e.set("$global",n.trackCookies[t.toString()],i)})}return this.trackTealiumId&&e.set("$global","tealium_id",this._getTealiumId()),this.drawbridgeConf&&this._prepareDrawbridgeSync(),this.success=this._prepareSuccessCallback(t.successCallback||[]),this.fail=t.errorCallback||void 0,this.td=e,s[a][this.id]=this};i.prototype._getAccountInfo=function(t){var i=t.writeKey.split("/")[0];return this._getPlatformInfo(t.host.split(".")[0])+"-"+i},i.prototype._getPlatformInfo=function(t){return"in"===t?"aws-us":"tokyo"===t?"aws-tokyo":"idcf"===t?"idcf":"unknown-"+t},i.prototype._setDmpCallbacks=function(){var t=this;if(void 0!==t.tokenIntimateMerger){var i={parent:t,onReceive:function(t){var i={};void 0!==t.imid&&(i.imid=t.imid),void 0!==t.segment_eids&&(i.im_segmentids=t.segment_eids),this.parent._onDmpCallback(i)}},e="//sync.im-apps.net/imid/segment?token="+t.tokenIntimateMerger+"&callback="+encodeURIComponent(a+"."+t.id+".dmpCb.list.im.onReceive");t.dmpCb.list.im=i,t.dmpCb.funcs.push(t._buildCreateScriptFunc(e))}if(void 0!==t.tokenAudienceOne){var n={parent:t,onReceive:function(t){var i={};void 0!==t.aoneuid&&(i.aoneuid=t.aoneuid),void 0!==t.segmentIds&&(i.aone_segmentids=t.segmentIds),void 0!==t.aonesegments&&(void 0!==t.aonesegments.demographic&&(i.aone_demographic=t.aonesegments.demographic),void 0!==t.aonesegments.interest&&(i.aone_interest=t.aonesegments.interest),void 0!==t.aonesegments.zipcode&&(i.aone_zipcode_home=t.aonesegments.zipcode.home,i.aone_zipcode_work=t.aonesegments.zipcode.work)),this.parent._onDmpCallback(i)}};e="//penta.a.one.impact-ad.jp/dd?oid="+t.tokenAudienceOne+"&rft=k&jsonp="+a+"."+t.id+".dmpCb.list.aone.onReceive&tgsrc=td";t.dmpCb.list.aone=n,t.dmpCb.funcs.push(t._buildCreateScriptFunc(e))}},i.prototype._onDmpCallback=function(t){this.td.set("$global",t),this.dmpCb.cnt++,Object.keys(this.dmpCb.list).length===this.dmpCb.cnt&&this.sendRequest()},i.prototype._getCookie=function(t){var i,e,n,s=document.cookie.split(";");for(i=0;i<s.length;i++)if(e=s[i].substr(0,s[i].indexOf("=")),n=s[i].substr(s[i].indexOf("=")+1),(e=e.replace(/^\s+|\s+$/g,""))===t)return unescape(n);return""},i.prototype._prepareSuccessCallback=function(t){var i=[];if(void 0!==typeof t&&"function"==typeof t&&i.push(t),0!==this.idSyncList.length){var n=function(t){var i=document.createElement("img");i.src=("https:"===document.location.protocol?"https://":"http://")+t,i.width=1,i.height=1,i.style.display="none",document.body.appendChild(i)};if(0<=this.idSyncList.indexOf("google")){var s=this;i.push(function(){var t="&td_client_id="+s.td.client.track.uuid+"&td_host="+document.location.host+"&account="+s.ac;n("cm.g.doubleclick.net/pixel?google_nid=treasuredata_dmp&google_cm&td_write_key=8151/fcd628065149d648b80f11448b4083528c0d8a91&td_global_id=td_global_id"+t)})}if(0<=this.idSyncList.indexOf("digi")){s=this;var e=function(t){n("bigmining.com/pixel/treasuredata2big.png?uid="+t)};i.push(function(){s.td.fetchGlobalID(e)})}if(0<=this.idSyncList.indexOf("tapad")){s=this;var o=function(t){n("pixel.tapad.com/idsync/ex/receive?partner_id=2766&partner_device_id="+t)};i.push(function(){s.td.fetchGlobalID(o)})}if(0<=this.idSyncList.indexOf("ttd")){s=this;i.push(function(){n("match.adsrvr.org/track/cmf/generic?ttd_pid=vbyog0i&ttd_tpi=1&ttd_puid="+s.ac)})}if(0<=this.idSyncList.indexOf("drawbridge")){s=this;var a=function(t){var i="https://in.treasuredata.com/postback/v3/event/drawbridge/sync?td_write_key=8151/b7ff8dff63df6245faed11ff989a523e6b0fb345&td_global_id="+t+"&td_client_id="+s.td.client.track.uuid+"&drawbridge_uid=${UUID}&account="+s.ac+"&_rand="+Math.random().toString(36).substring(7),e="p.adsymptotic.com/d/px/?_pid="+s.drawbridgeConf._pid+"&_psign="+s.drawbridgeConf._psign+"&_puuid="+s.td.client.track.uuid+"&_redirect="+encodeURIComponent(i);n(e)};i.push(function(){s.td.fetchGlobalID(a)})}}return function(){i.forEach(function(t){t()})}},i.prototype._buildCreateScriptFunc=function(n){return function(){var t=n,i=o.createElement("script");i.type="text/javascript",i.async=!0,i.src=t;var e=o.getElementsByTagName("script")[0];e.parentNode.insertBefore(i,e)}},i.prototype._getTealiumId=function(){var t=this._getCookie("utag_main").match(/^v_id\:(.*)\$_sn/);return null===t?"":t[1]},i.prototype._prepareDrawbridgeSync=function(){void 0!==this.drawbridgeConf._pid&&""!==this.drawbridgeConf._pid&&void 0!==this.drawbridgeConf._psign&&""!==this.drawbridgeConf._psign&&this.idSyncList.push("drawbridge")},i.prototype.sendRequest=function(){if(!this.sent){if(this.trackFingerprint&&s.Fingerprint2){var i=this;(new Fingerprint2).get(function(t){i.td.set("$global","td_fingerprint_id",t),i.td.trackEvent(i.table,{},i.success,i.fail)})}else this.td.trackEvent(this.table,{},this.success,this.fail);this.sent=!0}},i.prototype.boot=function(){this._setDmpCallbacks(),0!==this.dmpCb.funcs.length?this.dmpCb.funcs.forEach(function(t){t()}):this.sendRequest();},s[a]=i}(0,window,document,"TDWrapper");
+
+  // Function to get cookie
+  var getcookie = function(k){
+    var cs = document.cookie;
+    if(cs) {
+      var acs = cs.split('; ');
+      for(var i=0;i<acs.length;i++){
+        var cs = acs[i].split('=');
+        if(cs[0] === k){
+          return cs[1];
+        }
+      }
+    }
+    return '';
+  };
+
+  var getEnv = function(){
+    var env = '';
+    if (location.host.match(/(dev|develop|ib-test)/)) {
+      env = 'dev';
+    } else if (location.host.match(/(stg|staging)/)) {
+      env = 'stg';
+    } else {
+      env = 'prd';
+    }
+    return env;
+  };
+
+  var getDbName = function(){
+    var env = getEnv();
+    var dbname = '';
+    if (env === 'dev') {
+      dbname = 'dev_mg_media';
+    } else if (env === 'stg') {
+      dbname = 'stg_mg_media';
+    } else {
+      dbname = 'mg_media';
+    }
+    return dbname;
+  };
+
+  var settings = {
+    env           : getEnv(),
+    host          : 'in.treasuredata.com',
+    writeKey      : '9257/d1680901bb7d256f5428cdb7e210d1320e3ffc78',
+    dbname        : getDbName(),
+    tblname       : 'pageviews',
+    oid           : 'ff99f90aa76b56e4',
+    mg_td_version : '20190708-01'
+  };
+
+  // jsonldから情報を取得
+  var jsonld = document.getElementById('jsonld') || {};
+  if (jsonld.textContent) {
+    var textContent = jsonld.textContent;
+    // preserve newlines, etc - use valid JSON
+    textContent = textContent.replace(/\\n/g, "\\n")
+                             .replace(/\\'/g, "\\'")
+                             .replace(/\\"/g, '\\"')
+                             .replace(/\\&/g, "\\&")
+                             .replace(/\\r/g, "\\r")
+                             .replace(/\\t/g, "\\t")
+                             .replace(/\\b/g, "\\b")
+                             .replace(/\\f/g, "\\f");
+    // remove non-printable and other non-valid JSON chars
+    textContent = textContent.replace(/[\u0000-\u001f]+/g,"");
+
+    jsonld              = JSON.parse(textContent);
+    var mgPublisher     = jsonld.publisher               || {};
+    var mgPublisherName = jsonld.publisher.name          || '';
+    var mgCanonicalUrl  = jsonld.mainEntityOfPage['@id'] || '';
+    var mgPageType      = jsonld.pageType                || '';
+    var mgTitle         = jsonld.headline                || '';
+    var mgDatePublished = jsonld.datePublished           || '';
+    var mgDateModified  = jsonld.dateModified            || '';
+    var mgAuthor        = (jsonld.author) ? jsonld.author.name : '';
+    var mgIsSponsored   = jsonld.is_sponsored            || '';
+    var mgTaxonomies    = jsonld.taxonomies              || '';
+    var mgContentsCode  = jsonld.contentscode            || '';
+    var mgMmm           = (getcookie('mg_mmm')) ? getcookie('mg_mmm') : '';
+    var mgMmmUserInfo   = (getcookie('mg_mmm_user_info')) ? JSON.parse(decodeURIComponent(getcookie('mg_mmm_user_info'))) : '';
+  } else {
+    console.warn('jsonld.textContent is undefined.');
+  }
+
+  // Setting from here
+  var _opts = {
+    initParams : {
+        host: settings.host,
+        writeKey: settings.writeKey,
+        database: settings.dbname,
+        startInSignedMode: true
+    },
+    table : settings.tblname,
+    //tokenIntimateMerger : 'IntimateMerger_TOKEN',
+    //tokenAudienceOne : settings.oid,
+    customParam : {
+        mg_td_version     : settings.mg_td_version,
+        mg_publisher_name : mgPublisherName,
+        mg_canonical_url  : mgCanonicalUrl,
+        mg_page_type      : mgPageType,
+        mg_contentscode   : mgContentsCode,
+        mg_title          : mgTitle,
+        mg_date_published : mgDatePublished,
+        mg_date_modified  : mgDateModified,
+        mg_author         : mgAuthor,
+        mg_is_sponsored   : mgIsSponsored,
+        mg_is_amp_page    : false,
+        mg_taxonomies     : mgTaxonomies,
+        mg_mmm            : mgMmm,
+        mg_mmm_user_info  : mgMmmUserInfo
+    },
+    trackClicks : true,
+    trackCrossDomain : true,
+    trackFingerprint : true,
+    trackMetaDescription : true,
+    trackParrable : false,
+    trackCookies: {
+      // Key : column
+      '_ga' : 'ga_cookie_id',
+      'cX_P': 'cx_cookie_p',
+      'cX_S': 'cx_cookie_s',
+      'cX_G': 'cx_cookie_g',
+      '_cX_segmentInfo': 'cx_segment_info',
+      'AMP_ECID_GOOGLE': 'amp_cookie_id',
+      '_gid': 'dbm_cookie_id',
+      '_a1_u': 'aone_a1_u'
+    },
+    //idSyncList : ['google']
+    idSyncList : []
+  };
+  var tdw = new TDWrapper(_opts);
+  tdw.boot();
+
+  // グローバル変数にカスタムパラメーターの値を渡す
+  gTDConf = {
+    env : getEnv(),
+    dbname : getDbName(),
+    customparam : _opts.customParam
+  }
+
+  if (settings.env === 'dev' || settings.env === 'stg') console.log(settings);
+
+  /* univid */
+  /*
+  var getUniversalIDFingerprints = function(td, func){
+    var result;
+    window['TreasureUniversalIDCallback2'] = function(data) {
+      result['td_fp_ssl_session_id'] = data['td_fp_ssl_session_id'];
+      func(result);
+    }
+    window['TreasureUniversalIDCallback1'] = function(data) {
+      result = data;
+      var n=document.createElement("script");
+      n.type="text/javascript";
+      n.async=!0;
+      var query = '';
+      for (var key in result) {
+        query += '&' + key + '=' + encodeURIComponent(result[key]);
+      }
+      n.src='https://id-development.in.treasuredata.com/ssl_session_id?callback=TreasureUniversalIDCallback2&random=' + Math.random() + query;
+      var i=document.getElementsByTagName("script")[0];
+      i.parentNode.insertBefore(n,i);
+    }
+    var n=document.createElement("script");
+    n.type="text/javascript";
+    n.async=!0;
+    n.src='https://univid-cdn.treasuredata.com/pin_light.js?callback=TreasureUniversalIDCallback1&random=' + Math.random();
+    var i=document.getElementsByTagName("script")[0];
+    i.parentNode.insertBefore(n,i);
+  }
+  var td_univid = new MG_Treasure({
+   database: settings.dbname,
+   writeKey: settings.writeKey,
+  });
+  td_univid.set('$global', 'td_global_id', 'td_global_id');
+  getUniversalIDFingerprints(td_univid, function(data){
+   td_univid.trackEvent('log_web_tduniv', data);
+  });
+  */
+})();

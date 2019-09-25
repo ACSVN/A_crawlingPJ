@@ -1,0 +1,38 @@
+// クリックイベント計測
+// load-td-js-sdk.jsを先にロードしてから実行
+try {
+    var settings_clickevent = {
+        env           : gTDConf.env,
+        host          : 'in.treasuredata.com',
+        writeKey      : '9257/d1680901bb7d256f5428cdb7e210d1320e3ffc78',
+        dbname        : gTDConf.dbname,
+        tblname       : 'click_event',
+        protocol      : 'https'
+    };
+
+    var td_media = new MG_Treasure({
+        protocol: settings_clickevent.protocol,
+        host: settings_clickevent.host,
+        writeKey: settings_clickevent.writeKey,
+        database: settings_clickevent.dbname
+    });
+
+    function tracklink(text) {
+        // クリックイベントをTDへ送信
+        td_media.trackEvent(
+            settings_clickevent.tblname,
+            {
+                mg_contentscode: gTDConf.customparam.mg_contentscode,
+                mg_mmm: gTDConf.customparam.mg_mmm,
+                mg_mmm_user_info : gTDConf.customparam.mg_mmm_user_info,
+                tracklink_text: text
+            }
+        );
+
+        if (settings_clickevent.env === 'dev' || settings_clickevent.env === 'stg') console.log(gTDConf.customparam.mg_contentscode, gTDConf.customparam.mg_mmm, gTDConf.customparam.mg_mmm_user_info, text);
+    }
+
+    if (settings_clickevent.env === 'dev' || settings_clickevent.env === 'stg') console.log(settings_clickevent);
+} catch(e) {
+    console.error(e.message);
+}

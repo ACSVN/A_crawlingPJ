@@ -1,0 +1,2 @@
+!function(){"use strict";var i,e,d=!1;function n(){document[i]&&d&&window.location.reload()}void 0!==document.hidden?(i="hidden",e="visibilitychange"):void 0!==document.msHidden?(i="msHidden",e="msvisibilitychange"):void 0!==document.webkitHidden&&(i="webkitHidden",e="webkitvisibilitychange"),document.addEventListener(e,n),setTimeout(function(){d=!0,n()},9e5)}();
+//# sourceMappingURL=auto-refresh-script.js.map

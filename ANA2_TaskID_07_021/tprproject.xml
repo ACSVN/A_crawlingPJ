@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><tprproject>
+<date>10-06-19 08:40</date>
+<uid>p16b3f0bb318</uid>
+<ver>1</ver>
+<paths>
+<reports>reports</reports>
+<templates>templates</templates>
+<schedules>schedules</schedules>
+<stype1>tpr</stype1>
+<stype2>src</stype2>
+<sotype2>classes</sotype2>
+</paths>
+<tver>5.0.1-20190308.1</tver>
+<lastmod>20-09-19 10:02</lastmod>
+<editors>tpr\main.tpr;tpr\savepagesource.tpr;src\JP\GetHref.java;src\JP\SaveWebError.java</editors>
+</tprproject>

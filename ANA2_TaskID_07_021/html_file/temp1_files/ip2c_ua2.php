@@ -1,0 +1,1 @@
+__LBCUA.callback_ok({"rs_code":"1","company_name":"NULL","company_addr":"NULL","company_tel":"NULL","industry_name_l":"NULL","sales_range":"NULL"});

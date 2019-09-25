@@ -1,0 +1,441 @@
+.Bd\(n\) {
+  border: none;
+}
+.Bdc\(engadgetWhiteSmoke\) {
+  border-color: #efefef;
+}
+.Bdbc\(engadgetWhiteSmoke\) {
+  border-bottom-color: #efefef;
+}
+.Bdbc\(lightgrey\)\:h:hover {
+  border-bottom-color: lightgrey;
+}
+.Bdstartc\(engadgetWhiteSmoke\) {
+  border-left-color: #efefef;
+}
+.Bds\(s\) {
+  border-style: solid;
+}
+.Bdbs\(s\) {
+  border-bottom-style: solid;
+}
+.Bdbs\(s\)\:h:hover {
+  border-bottom-style: solid;
+}
+.Bdstarts\(s\) {
+  border-left-style: solid;
+}
+.Bdw\(1px\) {
+  border-width: 1px;
+}
+.Bdbw\(1px\) {
+  border-bottom-width: 1px;
+}
+.Bdbw\(1px\)\:h:hover {
+  border-bottom-width: 1px;
+}
+.Bdstartw\(1px\) {
+  border-left-width: 1px;
+}
+.Bdrs\(50\%\) {
+  border-radius: 50%;
+}
+.Bgc\(engadgetPurple\) {
+  background-color: #9a58b5;
+}
+.Bgc\(engadgetSteelGray\) {
+  background-color: #2b2d32;
+}
+.Bgc\(engadgetWhiteSmoke\) {
+  background-color: #efefef;
+}
+.Bgc\(engadgetBlack\) {
+  background-color: #0b0c0d;
+}
+.Bgc\(engadgetGhostWhite\)\:h:hover {
+  background-color: #f4f4f5;
+}
+.Bgz\(cv\) {
+  background-size: cover;
+}
+.Bgp\(c\) {
+  background-position: center;
+}
+.Bgr\(nr\) {
+  background-repeat: no-repeat;
+}
+.C\(engadgetFontLightGray\) {
+  color: #ababad;
+}
+.C\(engadgetBlack\) {
+  color: #0b0c0d;
+}
+.C\(engadgetFontBlack\) {
+  color: #56585c;
+}
+.C\(engadgetFontPurple\) {
+  color: #915DB0;
+}
+.C\(engadgetFontGray\) {
+  color: #959799;
+}
+.C\(\#fff\) {
+  color: #fff;
+}
+.C\(white\)\! {
+  color: white !important;
+}
+.C\(engadgetFontGray\)\:h:hover {
+  color: #959799;
+}
+.C\(\#fff\)\:h:hover {
+  color: #fff;
+}
+.C\(engadgetFontDarkPurple\)\:h:hover {
+  color: #744389;
+}
+.Cur\(p\) {
+  cursor: pointer;
+}
+.D\(f\) {
+  display: flex;
+}
+.D\(ib\) {
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+.D\(n\) {
+  display: none;
+}
+.D\(b\) {
+  display: block;
+}
+.Fld\(c\) {
+  flex-direction: column;
+}
+.Ai\(c\) {
+  align-items: center;
+}
+.Ai\(fs\) {
+  align-items: flex-start;
+}
+.Ai\(st\) {
+  align-items: stretch;
+}
+.Jc\(c\) {
+  justify-content: center;
+}
+.Jc\(fs\) {
+  justify-content: flex-start;
+}
+.Jc\(sa\) {
+  justify-content: space-around;
+}
+.Ff\(\$ff-primary\) {
+  font-family: "Helvetica Neue", "Hiragino Kaku Gothic Pro", Helvetica, Arial, sans-serif;
+}
+.Fw\(400\) {
+  font-weight: 400;
+}
+.Fw\(700\) {
+  font-weight: 700;
+}
+.Fz\(14px\) {
+  font-size: 14px;
+}
+.Fz\(12px\) {
+  font-size: 12px;
+}
+.Fz\(18px\) {
+  font-size: 18px;
+}
+.Fz\(24px\) {
+  font-size: 24px;
+}
+.Fz\(30px\) {
+  font-size: 30px;
+}
+.Fz\(32px\) {
+  font-size: 32px;
+}
+.Fz\(36px\) {
+  font-size: 36px;
+}
+.Fz\(15px\) {
+  font-size: 15px;
+}
+.H\(0\) {
+  height: 0;
+}
+.H\(16px\) {
+  height: 16px;
+}
+.H\(20px\) {
+  height: 20px;
+}
+.H\(25px\) {
+  height: 25px;
+}
+.H\(3px\) {
+  height: 3px;
+}
+.List\(n\) {
+  list-style-type: none;
+}
+.Lh\(30px\) {
+  line-height: 30px;
+}
+.Lh\(35px\) {
+  line-height: 35px;
+}
+.M\(0\) {
+  margin: 0;
+}
+.M\(MarginCenter\) {
+  margin: 0px auto;
+}
+.My\(40px\), .Mt\(40px\) {
+  margin-top: 40px;
+}
+.My\(40px\), .Mb\(40px\) {
+  margin-bottom: 40px;
+}
+.My\(5px\), .Mt\(5px\) {
+  margin-top: 5px;
+}
+.My\(5px\), .Mb\(5px\) {
+  margin-bottom: 5px;
+}
+.Mt\(30px\) {
+  margin-top: 30px;
+}
+.Mt\(10px\) {
+  margin-top: 10px;
+}
+.Mt\(25px\) {
+  margin-top: 25px;
+}
+.Mt\(3px\) {
+  margin-top: 3px;
+}
+.Mt\(15px\) {
+  margin-top: 15px;
+}
+.Mend\(20px\) {
+  margin-right: 20px;
+}
+.Mend\(5px\) {
+  margin-right: 5px;
+}
+.Mend\(7px\) {
+  margin-right: 7px;
+}
+.Mb\(15px\) {
+  margin-bottom: 15px;
+}
+.Mb\(35px\) {
+  margin-bottom: 35px;
+}
+.Mb\(10px\) {
+  margin-bottom: 10px;
+}
+.Mstart\(10px\) {
+  margin-left: 10px;
+}
+.Mstart\(5px\) {
+  margin-left: 5px;
+}
+.Mstart\(60px\) {
+  margin-left: 60px;
+}
+.Mstart\(25px\) {
+  margin-left: 25px;
+}
+.Miw\(300px\) {
+  min-width: 300px;
+}
+.Miw\(75px\) {
+  min-width: 75px;
+}
+.Miw\(10\%\) {
+  min-width: 10%;
+}
+.O\(n\) {
+  outline: none;
+}
+.P\(0\) {
+  padding: 0;
+}
+.P\(30px\) {
+  padding: 30px;
+}
+.Py\(10px\) {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.Py\(15px\) {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.Py\(20px\) {
+  padding-top: 20px;
+}
+.Py\(20px\), .Pb\(20px\) {
+  padding-bottom: 20px;
+}
+.Py\(25px\) {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+.Py\(40px\) {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+.Pb\(55\%\) {
+  padding-bottom: 55%;
+}
+.Pb\(66\%\) {
+  padding-bottom: 66%;
+}
+.Pstart\(10px\) {
+  padding-left: 10px;
+}
+.Pe\(n\) {
+  pointer-events: none;
+}
+.Pos\(r\) {
+  position: relative;
+}
+.Ta\(c\) {
+  text-align: center;
+}
+.Td\(n\) {
+  text-decoration: none;
+}
+.W\(100\%\) {
+  width: 100%;
+}
+.W\(100vw\) {
+  width: 100vw;
+}
+.W\(1235px\) {
+  width: 1235px;
+}
+.W\(20px\) {
+  width: 20px;
+}
+.W\(25px\) {
+  width: 25px;
+}
+.W\(300px\) {
+  width: 300px;
+}
+.W\(30px\) {
+  width: 30px;
+}
+.Wob\(ba\) {
+  word-break: break-all;
+}
+.Z\(1\) {
+  z-index: 1;
+}
+@media screen and (max-width:1259px) {
+  .W\(200px\)--lg {
+    width: 200px;
+  }
+  .W\(980px\)--lg {
+    width: 980px;
+  }
+}
+@media screen and (max-width:1023px) {
+  .D\(n\)--md {
+    display: none;
+  }
+  .Fz\(18px\)--md {
+    font-size: 18px;
+  }
+  .Mx\(20px\)--md {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  .Mt\(0\)--md {
+    margin-top: 0;
+  }
+  .W\(100\%\)--md {
+    width: 100%;
+  }
+}
+@media screen and (max-width:767px) {
+  .Bgc\(t\)\!--sm {
+    background-color: transparent !important;
+  }
+  .Bgc\(white\)--sm {
+    background-color: white;
+  }
+  .C\(engadgetFontBlack\)\!--sm {
+    color: #56585c !important;
+  }
+  .D\(n\)--sm {
+    display: none;
+  }
+  .D\(f\)--sm {
+    display: flex;
+  }
+  .D\(b\)--sm {
+    display: block;
+  }
+  .Fld\(c\)--sm {
+    flex-direction: column;
+  }
+  .Ai\(fs\)--sm {
+    align-items: flex-start;
+  }
+  .Jc\(c\)--sm {
+    justify-content: center;
+  }
+  .Fz\(22px\)--sm {
+    font-size: 22px;
+  }
+  .Fz\(24px\)--sm {
+    font-size: 24px;
+  }
+  .H\(100\%\)--sm {
+    height: 100%;
+  }
+  .Lh\(25px\)--sm {
+    line-height: 25px;
+  }
+  .Mt\(-10\%\)--sm {
+    margin-top: -10%;
+  }
+  .Mt\(10\%\)--sm {
+    margin-top: 10%;
+  }
+  .Mb\(15px\)--sm {
+    margin-bottom: 15px;
+  }
+  .Mb\(0\)--sm {
+    margin-bottom: 0;
+  }
+  .Mstart\(0\)--sm {
+    margin-left: 0;
+  }
+  .P\(0px\)--sm {
+    padding: 0px;
+  }
+  .Px\(20px\)--sm {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .Py\(15px\)--sm {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  .Pt\(10px\)--sm {
+    padding-top: 10px;
+  }
+  .W\(100\%\)--sm {
+    width: 100%;
+  }
+}

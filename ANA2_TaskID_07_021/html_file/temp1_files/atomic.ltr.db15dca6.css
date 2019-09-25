@@ -1,0 +1,171 @@
+.Bgc\(engadgetGray\) {
+  background-color: #414347;
+}
+.Bgc\(engadgetSteelGray\) {
+  background-color: #2b2d32;
+}
+.Bxz\(bb\) {
+  box-sizing: border-box;
+}
+.C\(engadgetFontGray\) {
+  color: #959799;
+}
+.C\(engadgetWhiteGray\)\:h:hover {
+  color: #d5d5d6;
+}
+.C\(white\)\:h:hover {
+  color: white;
+}
+.C\(engadgetWhiteGray\)\:a:active {
+  color: #d5d5d6;
+}
+.active + .active\+D\(b\), .D\(b\) {
+  display: block;
+}
+.D\(f\) {
+  display: flex;
+}
+.D\(ib\) {
+  display: inline-block;
+  *display: inline;
+}
+.D\(ib\), .Ov\(a\) {
+  zoom: 1;
+}
+.D\(if\) {
+  display: inline-flex;
+}
+.D\(n\) {
+  display: none;
+}
+.Fxg\(1\) {
+  flex-grow: 1;
+}
+.Fld\(c\) {
+  flex-direction: column;
+}
+.Ai\(c\) {
+  align-items: center;
+}
+.Jc\(sb\) {
+  justify-content: space-between;
+}
+.Jc\(c\) {
+  justify-content: center;
+}
+.Ff\(\$ff-primary\) {
+  font-family: "Helvetica Neue", "Hiragino Kaku Gothic Pro", Helvetica, Arial, sans-serif;
+}
+.Fw\(700\) {
+  font-weight: 700;
+}
+.Fz\(18px\) {
+  font-size: 18px;
+}
+.H\(100\%\) {
+  height: 100%;
+}
+.H\(100vh\) {
+  height: 100vh;
+}
+.H\(60px\) {
+  height: 60px;
+}
+.H\(6px\) {
+  height: 6px;
+}
+.Lh\(30px\) {
+  line-height: 30px;
+}
+.M\(0\) {
+  margin: 0;
+}
+.Mstart\(10px\) {
+  margin-left: 10px;
+}
+.T\(100\%\) {
+  top: 100%;
+}
+.Start\(0\) {
+  left: 0;
+}
+.Ov\(a\) {
+  overflow: auto;
+}
+.P\(0\) {
+  padding: 0;
+}
+.Px\(15px\) {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.Py\(2\%\) {
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+.Pstart\(8\%\) {
+  padding-left: 8%;
+}
+.Pos\(a\) {
+  position: absolute;
+}
+.Td\(n\) {
+  text-decoration: none;
+}
+.W\(100\%\) {
+  width: 100%;
+}
+.W\(12px\) {
+  width: 12px;
+}
+.W\(20\%\) {
+  width: 20%;
+}
+.W\(225px\) {
+  width: 225px;
+}
+.Z\(5001\) {
+  z-index: 5001;
+}
+@media screen and (max-width:1023px) {
+  .Bdtc\(engadgetFontLightGray\)--md {
+    border-top-color: #ababad;
+  }
+  .Bdtc\(engadgetGray\)--md {
+    border-top-color: #414347;
+  }
+  .Fz\(16px\)\!--md {
+    font-size: 16px !important;
+  }
+  .T\(a\)\!--md {
+    top: auto !important;
+  }
+  .P\(20px\)\!--md {
+    padding: 20px !important;
+  }
+  .Px\(20px\)\!--md {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  .Py\(22px\)\!--md {
+    padding-top: 22px !important;
+    padding-bottom: 22px !important;
+  }
+  .Py\(10px\)\!--md {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+  .Pos\(r\)\!--md {
+    position: relative !important;
+  }
+  .W\(100\%\)\!--md {
+    width: 100% !important;
+  }
+  .BdT--md {
+    border-top-width: 1px;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-style: solid;
+  }
+}

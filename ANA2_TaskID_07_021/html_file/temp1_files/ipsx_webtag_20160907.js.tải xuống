@@ -1,0 +1,1914 @@
+(function () {
+'use strict';
+    var UA = window.navigator.userAgent.toLowerCase();
+
+    var STATUS = {
+        'NONE'              : 0,
+        'INITIALIZED'       : 1,
+        'WAIT_FOR_RESPONSE' : 2,
+        'WAIT_FOR_DISPLAY'  : 3,
+        'STARTED_TO_DISPLAY': 4,
+        'DISPLAYED'         : 5
+    };
+
+    var LOGLEVEL = {
+        'NONE' : 0,
+        'DEBUG': 1,
+        'INFO' : 2,
+        'WARN' : 3,
+        'ERROR': 4,
+        'FATAL': 5
+    };
+
+    var HANDLER_TYPE = {
+        'IFRAME': "iframe",
+        'TIME_ROTATION': "time_rotation",
+        'ROTATION': "rotation"
+    };
+
+    var CREATIVE_TYPE = {
+        'HTML': "html",
+        'TEXT': "text",
+        'BANNER': "banner",
+        'FLASH': "flash",
+        'INTERSTITIAL': "interstitial",
+        'THIRD_PARTY': "third_party",
+        'DEFAULT_GIF': "default_gif"
+    };
+
+    //ユーティリティ
+    var _utility = {
+        isCorrectDataType : function(object, type) {
+            if (typeof(object) !== 'undefined') {
+                var clas = Object.prototype.toString.call(object).slice(8, -1);
+                if (clas && clas === type) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        },
+        generateRandom : function(numOfDigits) {
+            return Math.round(Math.random() * Math.pow(10,numOfDigits));
+        },
+        isIE : function() {
+            if (UA.match(/msie/)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isIOS : function() {
+            if (UA.match(/(iphone|ipod|ipad)/)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isAndroid : function() {
+            if (UA.indexOf("android") !== -1) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        log : function(level, code, message) {
+            var style = '';
+            switch (level) {
+                //KNOWN
+                case LOGLEVEL.NONE : style = 'color:black;'; break;
+                //DEBUG
+                case LOGLEVEL.DEBUG: style = 'color:black;'; break;
+                //INFO
+                case LOGLEVEL.INFO : style = 'color:blue;';  break;
+                //WARN
+                case LOGLEVEL.WARN : style = 'color:blue;';  break;
+                //ERROR
+                case LOGLEVEL.ERROR: style = 'color:red;';   break;
+                //FATAL
+                case LOGLEVEL.FATAL: style = 'color:red;';   break;
+            }
+            console.log('%c['+code+']'+message, style);
+        },
+        zeroPadding : function(i, numOfDigits) {
+            return (this.repeat('0', numOfDigits) + String(i)).substr(numOfDigits * -1);
+        },
+        repeat : function(str, i) {
+            return (new Array(i + 1).join(str));
+        },
+        parseJSON : function(str) {
+            try {
+                return (typeof(JSON) === 'undefined') ? eval('(' + str + ')') : JSON.parse(str);
+            } catch (e) {
+                return undefined;
+            }
+        },
+        getPageCharset : function() {
+            if (document.charset) {
+                return document.charset;
+            } else {
+                return document.characterSet;
+            }
+        },
+        shuffleListElements : function(list) {
+            var i = list.length;
+            while (--i) {
+                var j = Math.floor(Math.random() * (i + 1));
+                if (i === j) {
+                    continue;
+                } else {
+                    var k = list[i]; list[i] = list[j]; list[j] = k;
+                }
+            }
+            for (var l = 0; l <= list.length; l++) {
+                if ( list[l] === "" ) {
+                    list.splice(i,1);
+                }
+            }
+            return list;
+        },
+        getSizeFromString : function(str) {
+            var size = (str.toUpperCase()).split("X");
+            return {
+                width: size[0],
+                height: size[1]
+            };
+        },
+        isDefaultGif : function(str) {
+            return (str.match(/(AE|DS)(..)?\d\d?\.gif/)) ? true : false;
+        },
+        getWindowWidth: function() {
+            return (typeof(window.innerWidth) === 'undefined') ? document.body.clientWidth : window.innerWidth;
+        },
+        getWindowHeight: function() {
+            return (typeof(window.innerHeight) === 'undefined') ? document.body.clientHeight : window.innerHeight;
+        },
+        getDocumentWidth: function() {
+            return Math.max.apply(null, [document.body.clientWidth , document.body.scrollWidth, document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+        },
+        getDocumentHeight: function() {
+            return Math.max.apply(null, [document.body.clientHeight , document.body.scrollHeight, document.documentElement.scrollHeight, document.documentElement.clientHeight]);
+        },
+        getScrollLeft: function() {
+            return document.documentElement.scrollLeft || document.body.scrollLeft;
+        },
+        getScrollTop: function() {
+            return document.documentElement.scrollTop || document.body.scrollTop;
+        },
+        isOverlaySupported: function() {
+            var ver = window.navigator.appVersion.toLowerCase();
+            if (ver.indexOf('msie 6.') > -1) {
+                return false;
+            }
+            var UA = window.navigator.userAgent.toLowerCase();
+            if (UA && UA.indexOf('safari') > -1 && UA.indexOf('os 4') > -1) {
+                return false;
+            }
+            if (UA && (UA.indexOf('android 2.') > -1 || UA.indexOf('android 1.') > -1)) {
+                return false;
+            }
+            return true;
+        },
+        getElementsByClassName: function(element, className) {
+            var foundItems = [];
+            if (typeof(element.getElementsByClassName) === 'undefined') {
+                var allItems = element.getElementsByTagName("*");
+                for (var i = 0; i < allItems.length; i++) {
+                    if (allItems[i].className === className) {
+                        foundItems.push(allItems[i]);
+                    }
+                }
+                if (foundItems.length === 0) foundItems = null;
+            } else {
+                foundItems = element.getElementsByClassName(className);
+            }
+            return foundItems;
+        },
+        isLegacyIE : function() {
+            var ver = window.navigator.appVersion.toLowerCase();
+            if (ver.indexOf('msie 6.') > -1 || ver.indexOf('msie 7.') > -1) {
+                return true;
+            }
+            return false;
+        },
+        isExperia : function() {
+            if (UA.indexOf("sony") > -1 || UA.indexOf("so-") > -1 || UA.indexOf("sol") > -1) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        getFlashPlayerVersion : function() {
+            var version = 0;
+            var tmp = [];
+            try {
+                //Flash入ってるIE
+                var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+                tmp = fo.GetVariable("$version").match(/([0-9]+)/);
+                version = tmp[0];
+            } catch (e) {
+                if( navigator.mimeTypes ["application/x-shockwave-flash"] !== undefined ) {
+                    if( navigator.plugins && navigator.mimeTypes.length ) {
+                        //Flash入ってるIE以外のブラウザ
+                        tmp = navigator.plugins["Shockwave Flash"].description.match(/([0-9]+)/);
+                        version = tmp[0];
+                    }
+                }
+            }
+            return version;
+        }
+    };
+
+    var CHARSET = {
+        'UTF-8': "UTF8",
+        'Shift_JIS': "SJIS",
+        'EUC-JP': "EUC"
+    };
+
+    //データコンテナを定義
+    var dataContainer = {
+        general     : {
+            'AAMBnum': 1,
+            'pageid' : _utility.generateRandom(8)
+        },
+        adUnits     : {
+        }
+    };
+
+    var addEvent = function(element,event, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(event, handler, false);
+        } else if (element.attachEvent) {
+            element.attachEvent('on'+event, handler);
+        } else {
+            element['event'] = handler;
+        }
+    };
+
+    var _fadeInFlag = function() {
+        var flag;
+        this.getFlag = function() {
+            return flag;
+        };
+        this.setFlag = function(val) {
+            flag = val;
+        };
+    };
+
+    var _fadeIn = function(node, opacity, opacity_count, timer, flag) {
+        if(opacity <= 100) {
+            flag.setFlag(true);
+            // IE
+            node.style.filter = "alpha(opacity:"+opacity+")";
+            // Firefox
+            node.style.opacity = opacity/100;
+            var mtimer;
+            if(opacity == 0) {
+                mtimer = 500;
+            } else {
+                mtimer = timer;
+            }
+            opacity += opacity_count;
+            setTimeout(function(){
+                _fadeIn(node,opacity,opacity_count, timer, flag);
+            }, mtimer);
+        } else {
+            flag.setFlag(false);
+        }
+    };
+
+    var _fadeInStart = function(node, overlay_fade_sw, flag) {
+        if(overlay_fade_sw && !flag.getFlag()) {
+            _fadeIn(node, 0, 20, 100, flag);
+        }
+    };
+
+    var _isBottom = function() {
+        var scrollTop = _utility.getScrollTop();
+        var clientHeight = document.body.clientHeight;
+        var scrollHeight = document.body.scrollHeight || document.documentElement.scrollHeight;
+        if(scrollHeight === clientHeight) {
+            clientHeight = window.innerHeight;
+        }
+        var remain = scrollHeight - clientHeight - scrollTop;
+        return (remain <= 0);
+    };
+
+
+    var _getBottomPosition = function(size, reductionRate) {
+        return (_utility.getWindowHeight() - (size.height * reductionRate) + _utility.getScrollTop()) + 'px';
+    };
+
+    var _setOverlayStyles = function(adUnitId, html) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        var size = _utility.getSizeFromString(adUnit.size);
+        var rand = _utility.generateRandom(4);
+
+        //overlayするラッパーdivで括って返す
+        var wrapper = document.createElement('div');
+        var wrapper_id = "ipsx_overlay_"+rand;
+        wrapper.setAttribute("id", wrapper_id);
+
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        var styleText = '\n'+
+        '#ipsx_overlay_'+rand+' {\n'+
+        '   margin: 0px;\n'+
+        '   padding: 0px;\n'+
+        '   zIndex: 9999;\n'+
+        '   overflow: hidden;\n'+
+        '   display: none;\n'+
+        '}\n'+
+        '@media screeen and (max-device-width: 320px) {\n'+
+        '   #ipsx_overlay_'+rand+' {\n'+
+        '       width: 300px !important;\n'+
+        '   }\n'+
+        '}\n';
+        var documentWidth = 0;
+        var documentHeight = 0;
+        if (style.styleSheet) {
+            //IEとか
+            style.styleSheet.cssText = styleText;
+        } else {
+            //Chromeとか
+            style.appendChild(document.createTextNode(styleText));
+        }
+        document.getElementById(adUnitId).appendChild(style);
+
+        // [Android]オーバーレイしている枠内で広告をクリックしたのち、戻るボタンで戻ると、
+        // 広告枠の位置がおかしくなることがある。
+        // それを防ぐために、フラグ立てておく
+        // 原因は、クリックして別ウィンドウが立ち上がるときに、アドレスバーが表示され、
+        // resizeイベントが発火して表示位置の再計算が発生してしまうことによる。
+        // そのため、resize時の挙動をフラグがたっているときのみに限定し、
+        // 広告枠のtouchend時にフラグを折るようにすることで、広告クリック時に再計算を行わないようにする。
+
+        var pageReturnFlg = true;
+
+        //バナータップ時にタッチイベントが上位DOMに伝わるのを防ぐ
+        addEvent(wrapper, 'touchstart', function(e){
+            e.stopPropagation();
+        });
+
+        addEvent(wrapper, 'touchmove', function(e){
+            if (wrapper.style.display === "block") wrapper.style.display = "none";
+        });
+
+        addEvent(wrapper, 'touchend', function(e){
+            if (_utility.isAndroid()) pageReturnFlg = false;
+        });
+
+        var reductionRate = 1;
+
+        var flag = new _fadeInFlag();
+        flag.setFlag(false);
+
+        //windowが読み込み終わらないうちにレンダリングすると
+        //中途半端な高さでバナーが出る可能性があるので、
+        //window.onload時に表示する。
+        if (document.readyState === 'complete') {
+            setTimeout(function(){
+                //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                if (_utility.getWindowWidth() < size.width) {
+                    reductionRate = _utility.getWindowWidth() / size.width;
+                    wrapper.style.width = '100%';
+                } else {
+                    reductionRate = 1;
+                    wrapper.style.width = '';
+
+                }
+                wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                wrapper.style.position = 'absolute';
+                wrapper.style.display = "block";
+                _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+            },0);
+        } else {
+            addEvent(window, 'load', function(){
+                setTimeout(function(){
+                    //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                    if (_utility.getWindowWidth() < size.width) {
+                        reductionRate = _utility.getWindowWidth() / size.width;
+                    wrapper.style.width = '100%';
+                    } else {
+                        reductionRate = 1;
+                        wrapper.style.width = '';
+                    }
+                    wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                    wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.display = "block";
+                    _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                },0);
+            });
+        }
+
+        //スクロール時の処理
+        //iOSはtouchstart/move/endを、
+        //Androidはtouchとscrollのハイブリッド。
+        // Android V3以上で、スクロール時にontouchEndが効かないバグがあるのでontouchendが発火しない場合は
+        // https://code.google.com/p/android/issues/detail?id=19827
+        // スクロール終了を代用とする
+        //それ以外はスクロールイベントを使う。WinMobileは検討外…
+
+        //スクロール開始のイベントを追加
+        //iOS/Androidの場合、タッチ開始と同時にバナーを消す
+        if (_utility.isIOS() || _utility.isAndroid()) {
+            addEvent(document, 'touchstart', function() {
+                wrapper.style.display = "none";
+            });
+
+            addEvent(document, 'touchend', function() {
+                setTimeout(function(){
+                    //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                    if (_utility.getWindowWidth() < size.width) {
+                        reductionRate = _utility.getWindowWidth() / size.width;
+                        wrapper.style.width = _utility.getWindowWidth() + 'px';
+                    } else {
+                        reductionRate = 1;
+                        wrapper.style.width = '';
+                    }
+                    wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                    wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.display = "block";
+                    _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                },0);
+            });
+        }
+
+        //それ以外(PCから)の場合、スクロール開始と同時にバナーを消すが、
+        //下記でscroll関連のイベントはまとめて扱うのでそこで記述
+
+        //window.onscrollイベントの管理
+        var timerID = null;
+        if (!_utility.isIOS()) {
+            addEvent(window, 'scroll', function() {
+                // タイマーにより、スクロール終了時のみ処理を実行 
+                if (timerID === null) {
+                    wrapper.style.display = "none";
+                } else {
+                    clearTimeout(timerID);
+                }
+                timerID = setTimeout(function(){
+                    //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                    if (_utility.getWindowWidth() < size.width) {
+                        reductionRate = _utility.getWindowWidth() / size.width;
+                        wrapper.style.width = '100%';
+                    } else {
+                        reductionRate = 1;
+                        wrapper.style.width = '';
+                    }
+                    wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                    wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.display = "block";
+                    timerID = null;
+                    _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                }, 0);
+            });
+        }
+        if (_utility.isAndroid()) {
+            addEvent(window, 'resize', function() {
+                if (pageReturnFlg) {
+                    wrapper.style.display = "none";
+                    setTimeout(function(){
+                        //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                        if (_utility.getWindowWidth() < size.width) {
+                            reductionRate = _utility.getWindowWidth() / size.width;
+                            wrapper.style.width = '100%';
+                        } else {
+                            reductionRate = 1;
+                            wrapper.style.width = '';
+                        }
+                        wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                        wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                        wrapper.style.display = "block";
+                        _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                    }, 0);
+                }
+                pageReturnFlg = true;
+            });
+        } else {
+            addEvent(window, 'orientationchange', function() {
+                wrapper.style.display = "none";
+                setTimeout(function(){
+                    //window幅が広告枠の幅より狭い場合、広告枠の幅をwindow幅に合わせる
+                    if (_utility.getWindowWidth() < size.width) {
+                        reductionRate = _utility.getWindowWidth() / size.width;
+                        wrapper.style.width = '100%';
+                    } else {
+                        reductionRate = 1;
+                        wrapper.style.width = '';
+                    }
+                    wrapper.style.left = ((_utility.getWindowWidth() - (size.width * reductionRate)) / 2 + _utility.getScrollLeft()) + 'px';
+                    wrapper.style.top = _isBottom() ? _utility.getScrollTop() + 'px' : _getBottomPosition(size, reductionRate);
+                    wrapper.style.display = "block";
+                    _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                }, 0);
+            });
+        }
+
+        //ラッパーの中に受け取ったhtmlを入れる
+        wrapper.innerHTML = '';
+        wrapper.appendChild(html);
+        return wrapper;
+    };
+
+    var _getAdUnitDom = function(adUnitId, callback) {
+        var target = document.getElementById(adUnitId);
+        if (target) {
+            callback(target, adUnitId);
+        } else {
+            setTimeout(function(){
+                _getAdUnitDom(adUnitId, callback);
+            }, 500);
+        }
+    };
+
+    //contentをそのまま返す場合
+    var _displayHtml = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var brankDiv = document.createElement('div');
+            brankDiv.style.border = 'solid 0px';
+            brankDiv.style.padding = '0px';
+            brankDiv.style.margin = '0px';
+            //overlay
+            if (adUnit.overlay_sw) {
+                brankDiv = _setOverlayStyles(adUnitId, brankDiv);
+            }
+            var html = adUnit.contents[0];
+            brankDiv.innerHTML = html;
+
+            //overlayで枠のサイズがwindow幅より広い場合、画像を縮小させる
+            var images = brankDiv.getElementsByTagName("img");
+            if (adUnit.overlay_sw && images.length > 0 && _utility.getWindowWidth() < _utility.getSizeFromString(adUnit.size).width) {
+                var img = images[0];
+                img.style.width = '100%';
+            }
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    target.appendChild(brankDiv);
+                    adUnit.status = STATUS.DISPLAYED;
+                }, 0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    //iframe
+    var _displayIframe = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var iframe = document.createElement('iframe');
+            
+            //縦横サイズを取得
+            var size = _utility.getSizeFromString(adUnit.size);
+            var width  = size.width;
+            var height = size.height;
+
+            //iframeのスタイルを規定
+            iframe.width=width;
+            iframe.height=height;
+            iframe.noResize=true;
+            iframe.hspace=0;
+            iframe.vspace=0;
+            iframe.marginHeight=0;
+            iframe.marginWidth=0;
+            iframe.frameBorder=0;
+            iframe.scrolling = "no";
+
+            //overlay
+            if (adUnit.overlay_sw) {
+                var wrapper = _setOverlayStyles(adUnitId, iframe);
+            }
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    target.appendChild((!wrapper ? iframe : wrapper));
+                    iframe.src = adUnit.contents[0];
+                    adUnit.status = STATUS.DISPLAYED;
+                }, 0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    var _getOverlaySizeFromAdUnit = function(adUnit) {
+        var width = adUnit.width;
+        var height = adUnit.height;
+        if(adUnit.overlay_sw) {
+            var size = _utility.getSizeFromString(adUnit.size);
+            width = size.width;
+            height = size.height;
+        }
+        return {'width': width, 'height': height};
+    };
+
+    // friendly iframe 3rd party
+    var _displayFif3rdPartyTag = function(adUnitId, interstitial_flg) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var brankDiv = document.createElement('div');
+            brankDiv.style.border = 'solid 0px';
+            brankDiv.style.padding = '0px';
+            brankDiv.style.margin = '0px';
+            //overlay
+            if (adUnit.overlay_sw) {
+                brankDiv = _setOverlayStyles(adUnitId, brankDiv);
+            }
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    if(interstitial_flg) {
+                        target.appendChild(brankDiv);
+                        var doc = document;
+                        doc.open().write(('<body>'+adUnit.contents[0]+'</body>'));
+                        if (!_utility.isIE()) {
+                            doc.close();
+                        }
+                    } else {
+                        var size = _getOverlaySizeFromAdUnit(adUnit);
+                        _EAS_load_fif_mod_append_node(brankDiv,   // outer div node
+                                     dataContainer.general.fifhtmlpath + "/EAS_fif_normal.html",  // inner HTML URL
+                                     adUnit.contents[0],  // js script tag
+                                     size.width,     // width
+                                     size.height,    // height
+                                     4);    // IE height offset
+                        target.appendChild(brankDiv);
+                    }
+                    dataContainer.adUnits[adUnitId].status = STATUS.DISPLAYED;
+                }, 0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    //Rotation
+    var _displayRotation = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        //シャッフル
+        var creatives = [];
+        for (var i = 0; i < adUnit.contents.length; i++) {
+            var creative_type = _judgeCreativeType(adUnit.contents[i], adUnit);
+            if (!_utility.isDefaultGif(adUnit.contents[i]) && 
+                (creative_type === CREATIVE_TYPE.HTML || creative_type === CREATIVE_TYPE.THIRD_PARTY)) {
+                creatives.push([adUnit.contents[i], creative_type]);
+            }
+        }
+        if (creatives.length > 0) {
+            creatives = _utility.shuffleListElements(creatives);
+            if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+                if (creatives.length > 0) {
+                    //クリエイティブを入れる用の空div生成
+                    var brankDiv = document.createElement('div');
+                    brankDiv.style.border = 'solid 0px';
+                    brankDiv.style.padding = '0px';
+                    brankDiv.style.margin = '0px';
+                    var html = '';
+                    var prefix = adUnit.rotation_prefix;
+                    var suffix = adUnit.rotation_suffix;
+                    for (var j = 0; j < creatives.length; j++) {
+                        html += (prefix+creatives[j][0]+suffix);
+                    }
+                    brankDiv.innerHTML = html;
+                    _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                        setTimeout(function(){
+                            target.appendChild(brankDiv);
+                            var adUnit = dataContainer.adUnits[adUnitId];
+                            adUnit.status = STATUS.DISPLAYED;
+                        },0);
+                    });
+                }
+            } else {
+                _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+            }
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'No creatives shown');
+            adUnit.status = STATUS.DISPLAYED;
+        }
+    };
+
+    var _impressionRequest = function(adUnitId, adUnit, target, host, ccid) {
+        var src        = host+'/impcnt/CCID='+ccid+'/SITE='+adUnit.site+'/AREA='+adUnit.area+'?random='+_utility.generateRandom(4)+'/';
+        var img        = document.createElement('img');
+        var loaded     = false;
+        img.src        = src;
+        img.style.visibility = 'hidden';
+        img.onload     = img.onreadystatechange = function() {
+            if (!loaded) {
+                if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                    loaded = true;
+                    img.parentNode.removeChild(img);
+                }
+            }
+        };
+        document.body.appendChild(img);
+    };
+
+    var _getCCIDfromHtml = function(html) {
+        return parseInt(html.match(/\/CID=(.*?)\//)[1].substring(0,8), 16);
+    };
+
+    var _setCreativeToBrankDiv = function(adUnitId, adUnit, brankDiv, childs, rand) {
+        brankDiv.style.border = 'solid 0px';
+        brankDiv.style.padding = '0px';
+        brankDiv.style.margin = '0px';
+        brankDiv.style.position = 'relative';
+        
+        //表示させるクリエイティブを判定
+
+        for (var i = 0; i < adUnit.contents.length; i++) {
+           var tmpContent = adUnit.contents[i];
+            if (!_utility.isDefaultGif(tmpContent)) {
+                var creative_type = _judgeCreativeType(tmpContent, adUnit);
+                 switch (creative_type) {
+                    case CREATIVE_TYPE.HTML:
+                        childs.push({
+                            html : tmpContent,
+                            ccid : _getCCIDfromHtml(tmpContent)
+                        });
+                        break;
+                    case CREATIVE_TYPE.BANNER:
+                        childs.push(_createBannerHtml(adUnitId ,_utility.parseJSON(tmpContent)));
+                        break;
+                    case CREATIVE_TYPE.FLASH:
+                       childs.push(_createFlashHtml(adUnitId ,_utility.parseJSON(tmpContent)));
+                        break;
+                    default:
+                        //nothing to do
+                    }
+                }
+            }
+
+        //brankDivの中にクリエイティブを突っ込む
+        for (var j = 0; j < childs.length; j++) {
+            //空divを生成
+            var innerDiv = document.createElement('div');
+            innerDiv.setAttribute('id', 'ipsx_timerotation_innerdiv_'+rand+'_'+j);
+            if(j == 0) {
+                innerDiv.className = '';
+            } else {
+                innerDiv.className = 'ipsx_timerotation_innerdiv_'+rand;
+            }
+            innerDiv.style.border = 'solid 0px';
+            innerDiv.style.padding = '0px';
+            innerDiv.style.margin = '0px';
+            innerDiv.style.position = 'relative';
+            if(_utility.isIE()) {
+                if(j == 0) {
+                    innerDiv.style.display = 'block';
+                } else {
+                    innerDiv.style.display = 'none';
+                }
+            }
+            innerDiv.innerHTML = childs[j].html;
+            brankDiv.appendChild(innerDiv);
+        }
+    };
+
+    var _setStyle = function(rand, adUnitId) {
+        //styleを定義
+        var style = _getStyleContent(rand);
+        document.getElementById(adUnitId).appendChild(style);
+    };
+
+    var _getStyleContent = function(rand) {
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        var styleText = ''+
+        '.ipsx_timerotation_innerdiv_'+rand+' {\n'+
+            'width: 0px;\n'+
+            'height: 0px;\n'+
+            'overflow: hidden;\n'+
+            'position: absolute;\n'+
+        '}';
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = styleText;
+        } else {
+            style.appendChild(document.createTextNode(styleText));
+        }
+        return style;
+    };
+
+    // Timerotation Code for Inner JS
+    var _timeRotation = function(adUnitId, adUnit, host) {
+        //クリエイティブを入れる用の空div生成
+        var brankDiv = document.createElement('div');
+        var childs = [];
+        var rand = _utility.generateRandom(4);
+
+        _setCreativeToBrankDiv(adUnitId, adUnit, brankDiv, childs, rand);
+
+        if (childs.length > 0) {
+            //styleを定義
+            var span = document.getElementById("adSpan");
+            var style = _getStyleContent(rand);
+            span.appendChild(style);
+            span.appendChild(brankDiv);
+
+            //domから表示対象を拾ってくる
+            for (var k = 0; k < childs.length; k++) {
+                childs[k].dom = document.getElementById('ipsx_timerotation_innerdiv_'+rand+'_'+k);
+            }
+
+            //とりあえず1広告表示
+            var counter = 0;
+            childs[0].dom.className = '';
+            _impressionRequest(adUnitId, adUnit, span, host, childs[0].ccid);
+
+            //2広告以上の場合のみローテーションする
+            if (childs.length > 1) {
+                var timerID = setInterval(function(){
+                    var flag = new _fadeInFlag();
+                    flag.setFlag(false);
+                    if(adUnit.overlay_fade_sw) {
+                        var wrapper = parent.document.getElementById(adUnitId).childNodes[0];
+                        _fadeInStart(wrapper, adUnit.overlay_fade_sw, flag);
+                    }
+
+                    var next = counter + 1;
+                    if(!_utility.isIE()) {
+                        childs[counter % childs.length].dom.className = 'ipsx_timerotation_innerdiv_'+rand;
+                    }
+                    if(_utility.isIE()) {
+                        childs[counter % childs.length].dom.style.display="none";
+                        childs[next % childs.length].dom.style.display="block"; 
+                    }
+                    counter += 1;
+                    childs[counter % childs.length].dom.className = '';
+                    if (counter < childs.length * 2) {
+                        _impressionRequest(adUnitId, adUnit, span, host, childs[counter % childs.length].ccid);
+                    }
+                }, adUnit.timerotation_duration * 1000);
+             }
+             adUnit.status = STATUS.DISPLAYED;
+        }
+    };
+
+    // FIF TimeRotation inner JavaScript
+    var _displayFifTimeRotationInnerJS = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var brankDiv = document.createElement('div');
+            brankDiv.style.border = 'solid 0px';
+            brankDiv.style.padding = '0px';
+            brankDiv.style.margin = '0px';
+            //overlay
+            if (adUnit.overlay_sw) {
+                brankDiv = _setOverlayStyles(adUnitId, brankDiv);
+            }
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    var size = _utility.getSizeFromString(adUnit.size);
+                    _EAS_load_fif_mod_for_time_rotation(
+                                 adUnit,   // adUnit
+                                 dataContainer.general.host,   // host
+                                 adUnitId,   // outer div tag
+                                 brankDiv,   // outer div node
+                                 dataContainer.general.fifhtmlpath + "/EAS_fif_timerotation.html",  // inner HTML URL
+                                 size.width,     // width
+                                 size.height,    // height
+                                 4);    // IE offset height
+                    target.appendChild(brankDiv);
+                    dataContainer.adUnits[adUnitId].status = STATUS.DISPLAYED;
+                }, 0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    var _createExpandHtml   = function(adUnitId, obj, rand) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        var content = obj.ADTEXT;
+        var size = _utility.getSizeFromString(adUnit.size);
+
+        // EXPAND:Closeボタン画像データ
+        //  http://cdn2.crispadvertising.com/afw/2.2/components/img/closebtn2x.png
+        var closeButtonSrc = 'data:image/png;base64,'+
+        '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';
+
+        // EXPAND:ヘッダ背景画像データ
+        // http://1x1px.me/000000-0.8.png
+        var backgroudImageSrc = 'data:image/png;base64,'+
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNiOAMAANUAz5n+TlUAAAAASUVORK5CYII=';
+
+        //古いIEの場合はURLにする
+        if (_utility.isLegacyIE()) {
+            var protocol = ('https:' === document.location.protocol) ? 'https://' : 'http://';
+            closeButtonSrc = protocol+'cdn2.crispadvertising.com/afw/2.2/components/img/closebtn.png';
+            backgroudImageSrc = protocol+'1x1px.me/000000-0.8.png';
+        }
+
+        //styleを定義
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        var styleText = ''+
+        '.ipsx_ExpandBg_'+rand+' {\n'+
+            'position: absolute;\n'+
+            //'width:'+_utility.getDocumentWidth()+'px;\n'+
+            //'height:'+_utility.getDocumentHeight()+'px;\n'+
+            'width:100%;\n'+
+            'height:100%;\n'+
+            'left:0;\n'+
+            'top:0;\n'+
+            'z-index: 10000;\n'+
+            'display: none;\n'+
+            'background-image: url('+backgroudImageSrc+')\n'+
+        '}\n'+
+        '.ipsx_ExpandBg_'+rand+' .ipsx_ExpandPanel_'+rand+' {\n'+
+            'position:relative;\n'+
+            'left:0;\n'+
+            'top:0;\n'+
+        '}\n'+
+        '.ipsx_ExpandBg_'+rand+' .ipsx_ExpandCloseBtn_'+rand+' {\n'+
+            'position: absolute;\n'+
+            'left:0px;\n'+
+            'top:0px;\n'+
+        '}\n'+
+        '.ipsx_Banner_'+rand+' {\n'+
+            'display: block;\n'+
+        '}';
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = styleText;
+        } else {
+            style.appendChild(document.createTextNode(styleText));
+        }
+        document.getElementById(adUnitId).appendChild(style);
+
+        // Expand用HTML
+        // イベントの登録とかはここでは行わない。
+        // topとleftはExpandするときにやる
+        var reminder = '\n'+
+        '<div class="ipsx_Banner_'+rand+'">\n'+
+            '<img src="#banner#" border=0>\n'+
+        '</div>';
+        var expand = ''+
+        '<div class="ipsx_ExpandBg_'+rand+'">\n'+
+            '<div class="ipsx_ExpandPanel_'+rand+'">\n'+
+                '<a href="#click#" border="0" target="_blank" style="text-decoration: none;"><img src="#expand#" style="height:100%;" border=0></a>\n'+
+            '</div>\n'+
+            '<img class="ipsx_ExpandCloseBtn_'+rand+'" src="'+closeButtonSrc+'" border=0>\n'+
+        '</div>';
+
+        reminder = reminder.replace("#banner#", content.IMAGE);
+        expand = expand.replace("#click#", content.ADCLICK);
+        expand = expand.replace("#expand#", content.PANELIMAGE);
+        return {
+            'reminder': reminder,
+            'expand': expand
+        };
+    };
+
+    var _createFlashHtml   = function(adUnitId, obj) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        var content = obj.ADTEXT;
+        var swfVer = content.SWFVER;
+        //Flash Playerのバージョン取得。インストールされていなかったら0になる
+        var playerVer = _utility.getFlashPlayerVersion();
+        var html = '';
+
+        var pluginFlg = (playerVer >= swfVer) ? true : false;
+        if (pluginFlg) {
+            //Flash可の場合、Flashのオブジェクトを生成
+            html = ''+
+            '<object CLASSID="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" CODEBASE="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=3,0,0,0" id="impAswfid" width="#width#" height="#height#">\n'+
+            '    <param name="movie" value="#swfUrl#?#clickParam#=#click#"><param name="quality" value="autohigh"><param name="bgcolor" value="#FFFFFF"><param name="allowScriptAccess" value="always"><param name="wmode" value="transparent">\n'+
+            '    <embed src="#swfUrl#?#clickParam#=#click#" quality="autohigh" swLiveConnect="FALSE" allowScriptAccess="always" width="#width#" height="#height#" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed>\n'+
+            '</object>';
+        } else {
+            //Flash不可の場合は代替画像を返す
+            html = '<a href="#click#" border="0" target="_blank"><img src="#image#" border="0" width="#width#" height="#height#"></a>';
+        }
+
+        //置換
+        html = html.replace(/#swfUrl#/g, content.SWF);
+        html = html.replace(/#image#/g, content.IMAGE);
+        html = html.replace(/#clickParam#/g, content.CLICKPARAM);
+        html = html.replace(/#click#/g, content.ADCLICK);
+        html = html.replace(/#width#/g, content.WIDTH);
+        html = html.replace(/#height#/g, content.HEIGHT);
+
+        return {
+            'html': html,
+            'ccid': content.CCID
+        };
+    };
+
+    var _createBannerHtml   = function(adUnitId, obj) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        var content = obj.ADTEXT;
+        var html = '<a href="#click#" border="0" target="_blank"><img src="#image#" border=0></a>';
+        html = html.replace("#image#", content.IMAGE);
+        html = html.replace("#click#", content.ADCLICK);
+        return {
+            'html': html,
+            'ccid': content.CCID
+        };
+    };
+
+    var _judgeCreativeType = function(content, adUnit) {
+        var creative_type;
+        var size = adUnit.size;
+        var rotation_sw = adUnit.rotation_sw;
+        var text_sw = adUnit.text_sw;
+        var jsonObj = _utility.parseJSON(content);
+        if (jsonObj && !rotation_sw) {
+            //contentをjsonObjに差し替え
+            content = jsonObj;
+            //jsonObj
+            switch (jsonObj.TYPE) {
+                case 'banner':
+                creative_type = CREATIVE_TYPE.BANNER; break;
+                case 'flash':
+                creative_type = CREATIVE_TYPE.FLASH; break;
+            }
+        } else {
+            //代替gif
+            if (_utility.isDefaultGif(content)) {
+                creative_type = CREATIVE_TYPE.DEFAULT_GIF;
+            // } else if (size == 'TEXT' && !rotation_sw) {
+            } else if (text_sw && !rotation_sw) {
+                creative_type = CREATIVE_TYPE.TEXT;
+            } else if (content.toLowerCase().match(/<a\s.*?href\s*=\s*('|").*?adclick.*?('|").*?>/)) {
+                //HTML
+                //iPSのAタグを含んでいるどうかで、iPS配信or第三者配信を区別する
+                //iPSから配信されるhtml
+                creative_type = CREATIVE_TYPE.HTML;
+            } else {
+                creative_type = CREATIVE_TYPE.THIRD_PARTY;
+            }
+        }
+        return creative_type;
+    };
+
+    //banner
+    var _displayFlash = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var brankDiv = document.createElement('div');
+            brankDiv.style.border = 'solid 0px';
+            brankDiv.style.padding = '0px';
+            brankDiv.style.margin = '0px';
+            //overlay
+            if (adUnit.overlay_sw) {
+                brankDiv = _setOverlayStyles(adUnitId, brankDiv);
+            }
+            //html生成
+            var html = _createFlashHtml(adUnitId, _utility.parseJSON(adUnit.contents[0])).html;
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    var size = _getOverlaySizeFromAdUnit(adUnit);
+                    _EAS_load_fif_mod_append_node(brankDiv,   // outer div node
+                                 dataContainer.general.fifhtmlpath + "/EAS_fif_normal.html",  // inner HTML URL
+                                 html,  // html tags
+                                 size.width,     // width
+                                 size.height,    // height
+                                 0);    //IE height offset
+                    target.appendChild(brankDiv);
+                    adUnit.status = STATUS.DISPLAYED;
+                },0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    //banner
+    var _displayBanner = function(adUnitId) {
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.status === STATUS.STARTED_TO_DISPLAY) {
+            //クリエイティブを入れる用の空div生成
+            var brankDiv = document.createElement('div');
+            brankDiv.style.border = 'solid 0px';
+            brankDiv.style.padding = '0px';
+            brankDiv.style.margin = '0px';
+            //html生成
+            brankDiv.innerHTML = _createBannerHtml(adUnitId, _utility.parseJSON(adUnit.contents[0])).html;
+            //overlay
+            if (adUnit.overlay_sw) {
+                brankDiv = _setOverlayStyles(adUnitId, brankDiv);
+            }
+            _getAdUnitDom(adUnitId, function(target, adUnitId) {
+                setTimeout(function(){
+                    if (target.childNodes.length !== 0) target.removeChild(target.childNodes[0]);
+                    target.appendChild(brankDiv);
+                    adUnit.status = STATUS.DISPLAYED;
+                },0);
+            });
+        } else {
+            _utility.log(LOGLEVEL.WARN, 0, 'status is not STARTED_TO_DISPLAY');
+        }
+    };
+
+    var _judgeHandlerType = function(adUnitId) {
+        var handler_type;
+        var adUnit = dataContainer.adUnits[adUnitId];
+        if (adUnit.timerotation_sw) {
+            handler_type = HANDLER_TYPE.TIME_ROTATION;
+        } else if (adUnit.rotation_sw) {
+            handler_type = HANDLER_TYPE.ROTATION;
+        } else if (adUnit.iframe_sw) {
+            handler_type = HANDLER_TYPE.IFRAME;
+        } else if (adUnit.interstitial_sw) {
+            handler_type = CREATIVE_TYPE.INTERSTITIAL;
+        } else {
+            handler_type = _judgeCreativeType(adUnit.contents[0], adUnit);
+        }
+        return handler_type;
+    };
+
+    var _isCreativesLoaded = function(adUnitId) {
+        var loaded = false;
+        if (dataContainer.adUnits[adUnitId].status === STATUS.WAIT_FOR_DISPLAY) {
+            loaded = true;
+        }
+        return loaded;
+    };
+
+    //クリエイティブハンドラ
+    var _creativeHandler = {
+        'banner' : function(adUnitId) {
+            _displayBanner(adUnitId);
+        },
+        'flash' : function(adUnitId) {
+            _displayFlash(adUnitId);
+        },
+        'text' : function(adUnitId) {
+            _displayHtml(adUnitId);
+        },
+        'html' : function(adUnitId) {
+            _displayFif3rdPartyTag(adUnitId);
+        },
+        'third_party' : function(adUnitId) {
+            _displayFif3rdPartyTag(adUnitId);
+        },
+        'time_rotation' : function(adUnitId) {
+            _displayFifTimeRotationInnerJS(adUnitId);
+        },
+        'rotation' : function(adUnitId) {
+            _displayRotation(adUnitId);
+        },
+        'iframe' : function(adUnitId) {
+            _displayIframe(adUnitId);
+        },
+        'interstitial' : function(adUnitId) {
+            _displayFif3rdPartyTag(adUnitId, true);
+        },
+        'default_gif': function(adUnitId) {
+            var adUnit = dataContainer.adUnits[adUnitId];
+            _utility.log(4, 0, 'default gif is returned from server.');
+            adUnit.status = STATUS.DISPLAYED;
+        }
+    };
+
+    var _waitResponse = function(adUnitId, callback) {
+        if (_isCreativesLoaded(adUnitId)) {
+            setTimeout(function(){
+                callback(adUnitId);
+            }, 0);
+        //無限ループ回避でユーザーが指定した秒数繰り返してレスポンスがなければ強制終了
+        } else if (dataContainer.adUnits[adUnitId].waitCount <= dataContainer.general.waittime/0.300) {
+            dataContainer.adUnits[adUnitId].waitCount++;
+            setTimeout(function(){
+                _waitResponse(adUnitId, callback);
+            }, 300);
+        }
+    };
+
+    //ディスパッチャ
+    var _dispatcher = function(session) {
+        var adUnitIds = [];
+        if (session) {
+            //autoDisplayのとき
+            adUnitIds = session.adUnitIds;
+        } else {
+            //HTMLからキックされたとき(e.g. window.onload)
+            //データコンテナ内のautoDisplayになっていない枠をすべて表示
+            adUnitIds = queueOnload;
+        }
+
+        for (var j = 0; j < adUnitIds.length; j++) {
+            var adUnitId = adUnitIds[j];
+            _waitResponse(adUnitId, function(adUnitId){
+                dataContainer.adUnits[adUnitId].status = STATUS.STARTED_TO_DISPLAY;
+                _creativeHandler[_judgeHandlerType(adUnitId)](adUnitId);
+            });
+        }
+    };
+
+    //adUnitの設定からパラメータを作る
+    var _parameterBuilder = function(adUnit) {
+        var parameter = 'SITE='+adUnit.site+'/AREA='+adUnit.area+'/AAMSZ='+adUnit.size+'/';
+        //カスタムパラメータを処理
+        if (adUnit.custom_param) {
+            for (var i = 0; i < adUnit.custom_param.length; i++) {
+                var tmpParam = adUnit.custom_param[i].key + '=' + adUnit.custom_param[i].value + '/';
+                parameter += tmpParam;
+            }
+        }
+        return parameter;
+    };
+
+    //iPS-XからのレスポンスをパースしてadUnitに割り当てる
+    var _responseParser = function(map) {
+        for (var AAMBVariableName in map) {
+            var adUnitId = map[AAMBVariableName];
+            var adUnit = dataContainer.adUnits[adUnitId];
+            if (!adUnit.contents) {adUnit.contents = [];}
+            adUnit.contents.push(eval(AAMBVariableName));
+            adUnit.status = STATUS.WAIT_FOR_DISPLAY;
+        }
+    };
+
+    var _getAAMBVariableName = function(AAMBNum) {
+        return ('AAMB'+_utility.zeroPadding(AAMBNum,3));
+    };
+
+    //HTTPハンドラ
+    var _httpHandler = function(session) {
+        var adUnitIds = session.adUnitIds;
+
+        //adUnitごとで生成したパラメータを入れておく配列を定義
+        var params      = [];
+        var paramsNoLog = [];
+
+        //リクエスト種別ごとにadUnitIdを保持しておくための配列を定義
+        var ids         = [];
+        var idsNoLog    = [];
+
+        //URLとadUnitのマッピング定義
+        var adUnitURLMap = {};
+        var adUnitURLMapNoLog = {};
+
+        //データコンテナから最新のAAMBNumを取得
+        var AAMBNum     = dataContainer.general.AAMBnum;
+
+        var host        = dataContainer.general.host;
+        var encode      = dataContainer.general.encode;
+        var pageId      = (session.pageid) ? session.pageid : dataContainer.general.pageid;
+        var bserverBase = "";
+
+        //iphone, ipod, ipadのいずれかに該当するかをチェック
+        var impCheckiPhone = function() {
+            if (UA && (UA.indexOf('iphone') >= 0 || UA.indexOf('ipod') >= 0 || UA.indexOf('ipad') >= 0 || UA.indexOf('macintosh') >=0 && UA.indexOf('safari') >=0 && UA.indexOf('chrome') <0 )) {
+                return true;
+            }
+            return false;
+        };
+
+        //iOS端末に該当したら、32桁のGUIDを16進数でランダムに生成
+        if (impCheckiPhone()) {
+            if (!dataContainer.general.guid) {
+                var guidgen = function() {
+                    var S4 = function() {
+                        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+                    };
+                        return (S4()+S4()+S4()+S4()+S4()+S4()+S4()+S4()).toUpperCase();
+                };
+                dataContainer.general.guid = guidgen();
+            }
+            //GUIDをパスに付与してリクエスト
+            bserverBase = host+'/bservers/AAMALL/GUID='+dataContainer.general.guid+'/pageid='+pageId+'/acc_random='+session.acc_random+'/OENCJP='+encode+'/';
+        }
+        else {
+            bserverBase = host+'/bservers/AAMALL/pageid='+pageId+'/acc_random='+session.acc_random+'/OENCJP='+encode+'/';
+        };
+
+        //adUnitIdごとに処理していく
+        for (var i = 0; i < adUnitIds.length; i++) {
+            var adUnit      = dataContainer.adUnits[adUnitIds[i]];
+            var parameter   = _parameterBuilder(adUnit);
+            var AAMBVariableName;
+            if (adUnit.iframe_sw) {
+                //iframeの場合
+                //contentsの中身を洗いがえ
+                adUnit.contents = [host+'/hserver/pageid='+pageId+'/acc_random='+session.acc_random+'/OENCJP='+encode+'/'+parameter];
+                adUnit.status  = STATUS.WAIT_FOR_DISPLAY;
+            } else {
+                if (adUnit.timerotation_sw) {
+                    //タイムローテーションの場合
+                    for (var j = 0; j < adUnit.timerotation_creatives_num; j++) {
+                        AAMBVariableName = _getAAMBVariableName(AAMBNum);
+                        paramsNoLog.push(AAMBVariableName+'/'+parameter);
+                        idsNoLog.push(adUnitIds[i]);
+                        adUnitURLMapNoLog[AAMBVariableName] = adUnitIds[i];
+                        AAMBNum++;
+                    }
+                } else if (adUnit.rotation_sw) {
+                    //ローテーション広告の場合
+                    for (var k = 0; k < adUnit.rotation_creatives_num; k++) {
+                        AAMBVariableName = _getAAMBVariableName(AAMBNum);
+                        params.push(AAMBVariableName+'/'+parameter);
+                        ids.push(adUnitIds[i]);
+                        adUnitURLMap[AAMBVariableName] = adUnitIds[i];
+                        AAMBNum++;
+                    }
+                } else {
+                    //そのほか
+                    AAMBVariableName = _getAAMBVariableName(AAMBNum);
+                    params.push(AAMBVariableName+'/'+parameter);
+                    ids.push(adUnitIds[i]);
+                    adUnitURLMap[AAMBVariableName] = adUnitIds[i];
+                    AAMBNum++;
+                }
+                //ステータスを更新
+                adUnit.status = STATUS.WAIT_FOR_RESPONSE;
+            }
+        }
+
+        //DOM挿入時に目印にするscriptタグ
+        var s = document.getElementsByTagName('script')[0];
+
+        //bserver(NOLOG)のscriptを貼り付け
+        if (paramsNoLog.length) {
+            //URL組み立て
+            var srcNoLog = bserverBase;
+            for (var m = 0; m < paramsNoLog.length; m++) {
+                srcNoLog += paramsNoLog[m];
+            }
+            srcNoLog += 'NOLOG/';
+
+            var scriptNoLog     = document.createElement('script');
+            var loadedNoLog     = false;
+            scriptNoLog.type    = 'text/javascript';
+            scriptNoLog.async   = true;
+            scriptNoLog.src     = srcNoLog;
+            scriptNoLog.onload  = scriptNoLog.onreadystatechange = function() {
+                if (!loadedNoLog) {
+                    if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                        loadedNoLog = true;
+                        //該当adUnitsのcontentを一旦空にする
+                        for (var j = 0; j < idsNoLog.length; j++) {
+                            var adUnitId = idsNoLog[j];
+                            dataContainer.adUnits[adUnitId].contents = [];
+                        }
+                        _responseParser(adUnitURLMapNoLog);
+                    }
+                }
+            };
+            s.parentNode.insertBefore(scriptNoLog, s);
+        }
+
+        //bserverのscriptを貼り付け
+        if (params.length) {
+            //URL組み立て
+            var src = bserverBase;
+            for (var n = 0; n < params.length; n++) {
+                src += params[n];
+            }
+
+            var script     = document.createElement('script');
+            var loaded     = false;
+            script.type    = 'text/javascript';
+            script.async   = true;
+            script.src     = src;
+            script.onload  = script.onreadystatechange = function() {
+                if (!loaded) {
+                    if (!this.readyState || this.readyState === 'loaded' || this.readyState === 'complete') {
+                        loaded = true;
+                        //該当adUnitsのcontentを一旦空にする
+                        for (var j = 0; j < ids.length; j++) {
+                            var adUnitId = ids[j];
+                            dataContainer.adUnits[adUnitId].contents = [];
+                        }
+                        _responseParser(adUnitURLMap);
+                    }
+                }
+            };
+            s.parentNode.insertBefore(script, s);
+        }
+
+        //AAMBNumをdataContainerに戻す
+        dataContainer.general.AAMBnum = AAMBNum;
+
+        //autoDisplayフラグが立っていたらディスパッチャを起動する
+        if (session.autoDisplay) {
+            _dispatcher(session);
+        }
+
+    };
+
+    //前処理
+    var _preProcessor = function(session) {
+        //acc_random生成
+        session.acc_random = _utility.generateRandom(8);
+
+        //[TODO]cookie判定が入る
+        //仮にフラグをおろしておく
+
+        _httpHandler(session);
+    };
+
+    var _setData = function(inputData, key, defaultData, dataType, required) {
+        var outputData;
+        if (inputData == null){
+
+        } else if (_utility.isCorrectDataType(inputData[key], dataType)) {
+            outputData = inputData[key];
+        } else {
+            if (_utility.isCorrectDataType(defaultData, dataType)){
+                outputData = defaultData;
+            } else if (required) {
+                _utility.log(4, 102, key + ' is required setting. Please write it in settings.');
+            } else {
+                //デフォルト値を設定しない場合
+            }
+        }
+        return outputData;
+    };
+
+    var _setAdUnitData = function(inputAdUnit, defaultParam) {
+        var outputAdUnit = {};
+
+        //必須設定
+        //サイト設定
+        outputAdUnit.site = _setData(inputAdUnit, 'site', defaultParam.site, 'String', true);
+
+        //エリア設定
+        outputAdUnit.area = _setData(inputAdUnit, 'area', defaultParam.area, 'String', true);
+
+        //サイズ設定(AAMSZのサイズ)
+        outputAdUnit.size = _setData(inputAdUnit, 'size', defaultParam.size, 'String', true);
+
+        //幅設定(実際の表示幅を指定する場合のオプション)
+        outputAdUnit.width = _setData(inputAdUnit, 'width', 0, 'Number', false);
+
+        //高さ設定(実際の表示高さを指定する場合のオプション)
+        outputAdUnit.height = _setData(inputAdUnit, 'height', 0, 'Number', false);
+
+        //オプション設定
+        //iframe
+        outputAdUnit.iframe_sw  = _setData(inputAdUnit, 'iframe_sw',  false, 'Boolean', false);
+
+        //オーバーレイ
+        outputAdUnit.overlay_sw = _setData(inputAdUnit, 'overlay_sw', false, 'Boolean', false);
+        outputAdUnit.overlay_fade_sw = _setData(inputAdUnit, 'overlay_fade_sw', false, 'Boolean', false);
+
+        //ローテーションテキスト設定
+        if(inputAdUnit == null) {
+            inputAdUnit = {};
+            outputAdUnit.rotation_sw = false;
+        } else if(_utility.isCorrectDataType(inputAdUnit.rotation_sw, 'Boolean')) {
+            if (_utility.isCorrectDataType(inputAdUnit.rotation_creatives_num, 'Number')) {
+                outputAdUnit.rotation_sw = inputAdUnit.rotation_sw;
+                outputAdUnit.rotation_creatives_num = inputAdUnit.rotation_creatives_num;
+            } else {
+                _utility.log(4, 101, 'when rotation, "num_of_creatives" is requred. please write it in settings.');
+                outputAdUnit.rotation_sw = false;
+            }
+        } else {
+            outputAdUnit.rotation_sw = false;
+        }
+        if (outputAdUnit.rotation_sw) {
+            outputAdUnit.rotation_prefix = _setData(inputAdUnit, 'rotation_prefix',  '', 'String', false);
+            outputAdUnit.rotation_suffix = _setData(inputAdUnit, 'rotation_suffix',  '', 'String', false);
+        }
+
+        //タイムローテーション設定
+        outputAdUnit.timerotation_sw = _setData(inputAdUnit, 'timerotation_sw', false, 'Boolean', false);
+        if (outputAdUnit.timerotation_sw) {
+            outputAdUnit.timerotation_creatives_num = _setData(inputAdUnit, 'timerotation_creatives_num', 1, 'Number', false);
+            outputAdUnit.timerotation_duration      = _setData(inputAdUnit, 'timerotation_duration',      10, 'Number', false);
+        }
+
+        //インタースティシャル設定
+        outputAdUnit.interstitial_timeout_sw          = _setData(inputAdUnit, 'interstitial_timeout_sw',      true, 'Boolean', false);
+        outputAdUnit.interstitial_timeout_seconds     = _setData(inputAdUnit, 'interstitial_timeout_seconds', 5,    'Number',  false);
+        outputAdUnit.interstitial_sw                  = _setData(inputAdUnit, 'interstitial_sw',              false, 'Boolean', false);
+
+        // テキスト広告
+        outputAdUnit.text_sw                  = _setData(inputAdUnit, 'text_sw', false, 'Boolean', false);
+
+        //カスタムパラメータ
+        //AdUnitごと
+        if (_utility.isCorrectDataType(inputAdUnit.custom_param, 'Array')) {
+            if (outputAdUnit.custom_param === undefined) {
+                outputAdUnit.custom_param = [];
+            }
+            for (var i = 0; i < inputAdUnit.custom_param.length; i++) {
+                var tmpParameter = inputAdUnit.custom_param[i];
+                if (_utility.isCorrectDataType(tmpParameter.key, 'String') && (_utility.isCorrectDataType(tmpParameter.value, 'String') || _utility.isCorrectDataType(tmpParameter.value, 'Number'))) {
+                    outputAdUnit.custom_param.push(tmpParameter);
+                } else {
+                    //keyかvalueの型がおかしい
+                    _utility.log(4, 102, 'key or value of custom_param is wrong type.');
+                }
+            }
+        }
+
+        //カスタムパラメータ
+        //データコンテナのdefault_paramから持ってくる
+        if (_utility.isCorrectDataType(defaultParam.custom_param, 'Array')) {
+            if (outputAdUnit.custom_param === undefined) {
+                outputAdUnit.custom_param = [];
+            }
+            for (var j = 0; j < defaultParam.custom_param.length; j++) {
+                var tmpDefaultParameter = defaultParam.custom_param[j];
+                if (_utility.isCorrectDataType(tmpDefaultParameter.key, 'String') && (_utility.isCorrectDataType(tmpDefaultParameter.value, 'String') || _utility.isCorrectDataType(tmpDefaultParameter.value, 'Number'))) {
+                    outputAdUnit.custom_param.push(tmpDefaultParameter);
+                } else {
+                    //keyかvalueの型がおかしい
+                    _utility.log(4, 102, 'key or value of custom_param is wrong type.');
+                }
+            }
+        }
+
+        //サーバーから返ってきたコンテンツを入れておく配列の定義
+        outputAdUnit.contents = [];
+
+        return outputAdUnit;
+    };
+
+	    //セッションを定義
+    var session = {
+        'autoDisplay'   : true,
+        'adUnitIds'     : [],
+        'status'        : true
+    };
+
+    //イニシエータ
+    var _initiator = function(settings) {
+        //自動表示On/Off
+        //デフォルトはtrue
+        var autoDisplay = (_utility.isCorrectDataType(settings.autoDisplay, 'Boolean')) ? settings.autoDisplay : true;
+
+        session.autoDisplay = autoDisplay;
+
+        //引数で枠の設定を受ける
+        var adUnits = settings.adUnits;
+
+        //型チェック
+        if (!_utility.isCorrectDataType(adUnits, 'Array')) {
+            _utility.log(4, 100, 'adUnits are not correctly defined.');
+        }
+
+        //AdUnit単位の設定を処理
+        for (var i = 0; i < adUnits.length; i++) {
+            //ID設定
+            var adUnitId = _setData(adUnits[i], 'id', undefined, 'String', true);
+            //コンテナにデータを入れる
+            var adUnit = _setAdUnitData(adUnits[i], dataContainer.general.default_param);
+            adUnit.autoDisplay = autoDisplay;
+            if (adUnit.site && adUnit.area && adUnit.size) {
+                adUnit.status = STATUS.INITIALIZED;
+            } else {
+                adUnit.status = STATUS.NONE;
+            }
+            dataContainer.adUnits[adUnitId] = adUnit;
+            dataContainer.adUnits[adUnitId].waitCount = 0;
+        }
+
+    };
+
+    //全般にわたる設定
+    var _setGeneralSettings = function(settings) {
+        dataContainer.general.host = ('https:' === document.location.protocol ? 'https://' : 'http://' ) + _setData(settings, 'host', undefined, 'String', true);
+        dataContainer.general.sp_page_sw = _setData(settings, 'sp_page_sw', false, 'Boolean', true);
+        dataContainer.general.encode = CHARSET[_setData(settings, 'encode', _utility.getPageCharset(), 'String', true)];
+        dataContainer.general.waittime = _setData(settings, 'waittime', undefined, 'Number', true);
+
+        var fifhtmlpath = _setData(settings, 'fifhtmlpath', '', 'String', true);
+        if (fifhtmlpath.substr(fifhtmlpath.length - 1, 1) == '/') {
+            fifhtmlpath = fifhtmlpath.slice(0, fifhtmlpath.length -1);
+        }
+        dataContainer.general.fifhtmlpath = fifhtmlpath;
+
+        var inputDefaultParam = settings.default_param;
+        if (_utility.isCorrectDataType(inputDefaultParam, 'Object')) {
+            var outputDefaultParam = {};
+            //サイト
+            outputDefaultParam.site = _setData(inputDefaultParam, 'site', undefined, 'String', false);
+            //エリア
+            outputDefaultParam.area = _setData(inputDefaultParam, 'area', undefined, 'String', false);
+            //サイズ
+            outputDefaultParam.size = _setData(inputDefaultParam, 'size', undefined, 'String', false);
+
+            //カスタムパラメータ
+            var inputCustomParam = inputDefaultParam.custom_param;
+            var outputCustomParam = [];
+            if (_utility.isCorrectDataType(inputCustomParam, 'Array')) {
+                for (var i = 0; i < inputCustomParam.length; i++) {
+                    var tmpCustomParam = inputCustomParam[i];
+                    if (_utility.isCorrectDataType(tmpCustomParam.key, 'String') && (_utility.isCorrectDataType(tmpCustomParam.value, 'String') || _utility.isCorrectDataType(tmpCustomParam.value, 'Number'))) {
+                        outputCustomParam.push(tmpCustomParam);
+                    } else {
+                        //keyかvalueの型がおかしい
+                        _utility.log(4, 102, 'key or value of custom_param is wrong type.');
+                    }
+                }
+            }
+            outputDefaultParam.custom_param = outputCustomParam;
+
+            dataContainer.general.default_param = outputDefaultParam;
+        } else {
+            dataContainer.general.default_param = {};
+        }
+    };
+
+    // adUnit: adUnit
+    // host : host for impression request
+    // adUnitId: outer div tag id
+    // node: outer div node
+    // src: inner HTML URL
+    // width: width
+    // height: height
+    // ie_offset: IE offset height
+    var _EAS_load_fif_mod_for_time_rotation = function(adUnit, host, adUnitId, node, src, width, height, ie_offset) {
+        var iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.style.width = width + "px";
+        iframe.style.height = height + "px";
+        iframe.style.margin = "0px";
+        iframe.style.borderWidth = "0px";
+        iframe.style.padding = "0px";
+        iframe.scrolling = "no";
+        iframe.frameBorder = "0";
+        iframe.allowTransparency = "true";
+        iframe.EAS_src = "";
+        iframe.adUnit = adUnit;
+        iframe.adUnitId = adUnitId;
+        iframe.host = host;
+        iframe.ie_height_offset = ie_offset;
+        iframe.frame_width = width;
+        iframe.frame_height = height;
+        node.appendChild(iframe)
+    };
+
+    // node: outer div node
+    // src: inner HTML URL
+    // content: html source for document.write in inner HTML
+    // width: width
+    // height: height
+    // ie_offset: IE height offset
+    var _EAS_load_fif_mod_append_node = function(node, src, content, width, height, ie_offset) {
+        var iframe = document.createElement("iframe");
+        iframe.src = src;
+        iframe.style.width = width + "px";
+        iframe.style.height = height + "px";
+        iframe.style.margin = "0px";
+        iframe.style.borderWidth = "0px";
+        iframe.style.padding = "0px";
+        iframe.scrolling = "no";
+        iframe.frameBorder = "0";
+        iframe.allowTransparency = "true";
+        iframe.EAS_src = content;
+        iframe.ie_height_offset = ie_offset;
+        iframe.frame_width = width;
+        iframe.frame_height = height;
+        node.appendChild(iframe)
+    };
+
+    var _adsRMIFOnL = function(win, doc) {
+        var adFrame = win.frameElement;
+        var div = adFrame.parentNode;
+
+        if (div.childNodes.length == 1)
+        {
+            var adSpan = doc.getElementById("adSpan");
+            var adDiv = doc.getElementById("adDiv");
+
+            if(adFrame.frame_width && adFrame.frame_height) {
+        	    adFrame.style.width = adFrame.frame_width + "px";
+      	        adFrame.style.height = adFrame.frame_height + "px";
+            } 
+            else if (adSpan) 
+            {
+                var IE = (navigator.appName=="Microsoft Internet Explorer");
+                var w = adDiv.scrollWidth;
+
+                if(IE && adDiv.offsetHeight) {
+                    var h = adDiv.offsetHeight - adFrame.ie_height_offset;
+                } else {
+                    var h = adDiv.offsetHeight;
+                }
+
+        	    adFrame.style.width = w + "px";
+      	        adFrame.style.height = h + "px";
+            }
+        }
+    };
+
+    var queue = [];
+    var queueOnload = [];
+
+    var _enqueueIds = function(ids) {
+      for (var i = 0; i < ids.length; i++) {
+        if (!dataContainer.adUnits[ids[i]]) {
+          continue;
+        }
+        else {
+          queue.push(ids[i]);
+          if (!dataContainer.adUnits[ids[i]].autoDisplay) {
+              queueOnload.push(ids[i]);
+          }
+        }
+      }
+    };
+
+    var _queueCheckLoop = function() {
+
+      //キューにidがある場合
+      if (queue.length != 0) {
+        //処理中にキューが追加される可能性があるためこの時点でループ回数を決定
+        var rooptimes = queue.length;
+        for (var i = 0; i < rooptimes; i++) {
+          //session.adUnitIdsにidを追加
+          session.adUnitIds.push(queue[0]);
+          //0番目のidを削除し、その他のidも一つずつずらす
+          queue.shift(0);
+        }
+        //sesion.adUnitIdsに入っているidを一括リクエスト
+        _preProcessor(session);
+        //session.adUnitIdsを空にする
+        session.adUnitIds = [];
+        _queueCheckLoop();
+      //html読み込みが完了していた場合
+      } else if (!session.status) {
+        if (queue.length !=0) {
+          _queueCheckLoop();
+        }
+        return;
+      //200ms待ちもう一度queueCheckLoopを実行
+      } else {
+        setTimeout(function(){
+          _queueCheckLoop();
+        }, 200);
+      }
+    };
+
+    var _lazyloadDisplayAds = function(ids) {
+      //lazyload用セッションを定義
+      var lazyloadSession = {
+          'autoDisplay'   : true,
+          'adUnitIds'     : [],
+      };
+
+      //idをadUnitIdsに入れる
+      for (var i = 0; i < ids.length; i++) {
+        if (!dataContainer.adUnits[ids[i]]) {
+          continue;
+        }
+        else {
+          lazyloadSession.adUnitIds.push(ids[i]);
+        }
+      }
+
+      if (lazyloadSession.adUnitIds.length < 1) {
+        return;
+      }
+      else {
+        //lazyloadSession.adUnitIdsにあるid分リクエスト
+        _preProcessor(lazyloadSession);
+      }
+    };
+
+    // レスポンシブタグ連携用変数
+    var matchMedia;
+    var MEDIA_QUERY_ENABLED;
+
+    var _infiniteAdUnitCheck = function(settings) {
+      // レスポンシブタグで定義した変数を受け取る
+      MEDIA_QUERY_ENABLED = (window.IPSX.MEDIA_QUERY_ENABLED) ? window.IPSX.MEDIA_QUERY_ENABLED : false;
+      matchMedia = (window.IPSX.matchMedia) ? window.IPSX.matchMedia : undefined;
+
+      var adUnits = settings.adUnits;
+
+      //型チェック
+      if (!_utility.isCorrectDataType(adUnits, 'Array')) {
+          _utility.log(4, 100, 'adUnits are not correctly defined.');
+      }
+
+      for (var i = 0; i < adUnits.length; i++) {
+        // 型チェック
+        var adUnit = _setAdUnitData(adUnits[i], dataContainer.general.default_param);
+        adUnit.responsive = _setData(adUnits[i], 'responsive', undefined, 'Object', false); 
+        adUnit.baseId = _setData(adUnits[i], 'base_id', undefined, 'String', true); 
+        adUnit.targetTagName = _setData(adUnits[i], 'target_tag_name', undefined, 'String', true); 
+        adUnit.targetClassName = _setData(adUnits[i], 'target_class_name', undefined, 'String', true); 
+        adUnit.repeatCount = _setData(adUnits[i], 'repeat_count', undefined, 'Number', true); 
+        adUnit.classSetting = _setData(adUnits[i], 'class_setting', undefined, 'Array', false); 
+        adUnit.idIncrement = 1;
+        adUnit.waitCount = 0;
+
+        // メディアクエリが無効且つmedia_query_disabledが'hidden'の場合のみ処理しない
+        var roopCheck = true;
+        if (adUnits[i].responsive !== undefined) {
+          if (!MEDIA_QUERY_ENABLED && adUnits[i].responsive.media_query_disabled === 'hidden') {
+            roopCheck = false;
+          }
+        }
+
+        if (roopCheck) {
+          _infiniteCheckLoop(adUnit);
+        }
+      }
+    };
+
+    var _infiniteCheckLoop = function(adUnit) {
+      // メディアクエリがマッチしなければスキップ
+      var roopCheck = true;
+      if (matchMedia !== undefined && !(matchMedia(adUnit.responsive.media_query).matches)) {
+        roopCheck = false;
+      }
+
+      if (roopCheck) {
+        // 指定のtargetTagName、targetClassNameが入ったDOMを集める
+        var targetTags = $(adUnit.targetTagName + "[class='" + adUnit.targetClassName + "']");
+
+        for (var i = 0; i < targetTags.length; i++) {
+          if (!targetTags[i].IPSX_AdLoaded) {
+            // 対象のDOMに処理済みフラグを追加
+            targetTags[i].IPSX_AdLoaded = true;
+            var targetIds = [];
+
+            for (var j = 0; j < adUnit.repeatCount; j++) {
+              // idを生成
+              targetIds[j] = adUnit.baseId + adUnit.idIncrement;
+              dataContainer.adUnits[targetIds[j]] = JSON.parse(JSON.stringify(adUnit));
+              dataContainer.adUnits[targetIds[j]].status = STATUS.INITIALIZED;
+        
+              // 生成したidのdivタグを挿入 classSettingがあればクラス設定
+              var element = document.createElement("div");
+              element.id = targetIds[j];
+              if (adUnit.classSetting) {
+                element.className = adUnit.classSetting[j];
+              }
+              targetTags[i].appendChild(element);
+        
+              adUnit.idIncrement++;
+            }
+
+            // idを引数にしてリクエスト処理へ
+            window.IPSX.reloadAds(targetIds);
+          }
+        }
+      }
+      setTimeout(function() {
+        _infiniteCheckLoop(adUnit);
+      },300);
+    };
+
+    var IPSX = {
+        setGeneralSettings : function(settings) {
+            _setGeneralSettings(settings);
+        },
+        initiateAdUnit : function(settings) {
+            _initiator(settings);
+            _queueCheckLoop();
+        },
+        enqueueIds : function(ids) {
+            _enqueueIds(ids);
+        },
+        onloadDisplayAds : function() {
+            //autoDisplayがfalseの場合の表示
+            _dispatcher(null);
+            //queueCheckLoopを終了させる
+            session.status = false;
+        },
+        lazyloadDisplayAds : function(ids) {
+            //lazyload枠リクエスト、表示
+            _lazyloadDisplayAds(ids);
+        },
+        initiateInfiniteAdUnit : function(settings) {
+            _infiniteAdUnitCheck(settings);
+        },
+        dataContainer : dataContainer,
+        reloadAds : function(adUnitIds) {
+            //pageIdを更新
+            _httpHandler({
+                'adUnitIds'     : adUnitIds,
+                'acc_random'    : _utility.generateRandom(8),
+                'autoDisplay'   : true,
+                'pageid'        : _utility.generateRandom(8)
+            });
+        },
+        timeRotation: function(unitId, unit, host) {
+            _timeRotation(unitId, unit, host);
+        },
+        adsRMIFOnL: function(win, doc) {
+            _adsRMIFOnL(win, doc);
+        }
+    };
+
+    //イニシエータ呼び出す外部関数
+    window.IPSX = IPSX;
+
+})();

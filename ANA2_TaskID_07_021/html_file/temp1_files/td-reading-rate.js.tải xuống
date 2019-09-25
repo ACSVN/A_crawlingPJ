@@ -1,0 +1,650 @@
+(function () {
+    // 媒体毎に設定を変更
+    var configs = {
+        gizmodo: {
+            target: {
+                isSp : {
+                    className : "gz-is-sp"
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "p-post-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "p-post-content",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spTop : {
+                    className    : "p-post-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-post-content",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        fuze: {
+            target: {
+                isSp : {
+                    className : ""
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "fz-summary-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "fz-entryDetail-footer",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "fz-summary-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "fz-entryDetail-footer",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        businessinsider: {
+            target: {
+                isSp : {
+                    className : "sp"
+                },
+                isBc : {
+                    className : "is-brandchannel"
+                },
+                pcTop : {
+                    className    : "p-post-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "p-post",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spTop : {
+                    className    : "p-post-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-post",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                pcBcTop : {
+                    className    : "bc-primary-articleTitle",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "bc-primary-articlePost",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "bc-primary-articleTitle",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "bc-primary-articlePost",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        lifehacker: {
+            target: {
+                isSp : {
+                    className : "is-sp"
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "lh-entryDetail-body",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "lh-entryDetail-body",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spTop : {
+                    className    : "lh-entryDetail-body",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "lh-entryDetail-body",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        digiday: {
+            target: {
+                isSp : {
+                    className : ""
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "entry-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "footer-entry-meta",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spTop : {
+                    className    : "entry-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "footer-entry-meta",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        cafeglobe: {
+            target: {
+                isSp : {
+                    className : "is-sp"
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "po-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "po-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "p-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        mashingup: {
+            target: {
+                isSp : {
+                    className : "is-sp"
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "po-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "po-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "p-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        mylohas: {
+            target: {
+                isSp : {
+                    className : "is-sp"
+                },
+                isBc : {
+                    className : "is-brandchannel"
+                },
+                pcTop : {
+                    className    : "po-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "po-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "p-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "bc-primary-articleTitle",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "bc-primary-article",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "bc-primary-articleTitle",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "bc-primary-article",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        glitty: {
+            target: {
+                isSp : {
+                    className : "is-sp"
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "po-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "po-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "p-Post_Post",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "p-Post_Share",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        },
+        roomie: {
+            target: {
+                isSp : {
+                    className : ""
+                },
+                isBc : {
+                    className : ""
+                },
+                pcTop : {
+                    className    : "r-article-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBottom : {
+                    className    : "r-snsbutton",
+                    elemKey      : 1,
+                    elemPosition : "top"
+                },
+                spTop : {
+                    className    : "r-article-title",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBottom : {
+                    className    : "r-snsbutton",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                pcBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                },
+                spBcTop : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "top"
+                },
+                spBcBottom : {
+                    className    : "",
+                    elemKey      : 0,
+                    elemPosition : "bottom"
+                }
+            }
+        }
+    }
+    var getHostEnv = function(){
+        var e = '', m = '';
+        // 環境判定
+        if (location.host.match(/(dev|develop|ib-test)/)) {
+            e = 'dev';
+        } else if (location.host.match(/(stg|staging)/)) {
+            e = 'stg';
+        } else {
+            e = 'prd';
+        }
+        // 媒体判定
+        if (location.host.match(/gizmodo/)) m = 'gizmodo';
+        else if (location.host.match(/fuze/)) m = 'fuze';
+        else if (location.host.match(/businessinsider/)) m = 'businessinsider';
+        else if (location.host.match(/lifehacker/)) m = 'lifehacker';
+        else if (location.host.match(/digiday/)) m = 'digiday';
+        else if (location.host.match(/cafeglobe/)) m = 'cafeglobe';
+        else if (location.host.match(/mashingup/)) m = 'mashingup';
+        else if (location.host.match(/mylohas/)) m = 'mylohas';
+        else if (location.host.match(/glitty/)) m = 'glitty';
+        else if (location.host.match(/roomie/)) m = 'roomie';
+        return { env: e, media: m, conf: configs[m] };
+    };
+    var setReadingRate = function(){
+        var hostEnv      = getHostEnv();
+        var target       = hostEnv.conf.target;
+        var isBc         = document.getElementsByTagName('body')[0].classList.contains(target.isBc.className);
+        var isSp         = document.getElementsByTagName('body')[0].classList.contains(target.isSp.className);
+        if (isBc) {
+            // Brandchannel
+            var targetTop    = (isSp) ? target.spBcTop.className : target.pcBcTop.className;
+            var targetBottom = (isSp) ? target.spBcBottom.className : target.pcBcBottom.className;
+            var keyTop       = (isSp) ? target.spBcTop.elemKey : target.pcBcTop.elemKey;
+            var keyBottom    = (isSp) ? target.spBcBottom.elemKey : target.pcBcBottom.elemKey;
+            var posTop       = (isSp) ? target.spBcTop.elemPosition : target.pcBcTop.elemPosition;
+            var posBottom    = (isSp) ? target.spBcBottom.elemPosition : target.pcBcBottom.elemPosition;
+        } else {
+            // Brandchannel以外
+            var targetTop    = (isSp) ? target.spTop.className : target.pcTop.className;
+            var targetBottom = (isSp) ? target.spBottom.className : target.pcBottom.className;
+            var keyTop       = (isSp) ? target.spTop.elemKey : target.pcTop.elemKey;
+            var keyBottom    = (isSp) ? target.spBottom.elemKey : target.pcBottom.elemKey;
+            var posTop       = (isSp) ? target.spTop.elemPosition : target.pcTop.elemPosition;
+            var posBottom    = (isSp) ? target.spBottom.elemPosition : target.pcBottom.elemPosition;
+        }
+
+        var top = document.documentElement.scrollTop || document.body.scrollTop;
+        var cheight = document.documentElement.clientHeight || document.body.clientHeight;
+        if (posTop === 'bottom') {
+            var a_top = document.documentElement.scrollTop + document.getElementsByClassName(targetTop)[keyTop].getBoundingClientRect().bottom;
+        } else {
+            var a_top = document.documentElement.scrollTop + document.getElementsByClassName(targetTop)[keyTop].getBoundingClientRect().top;
+        }
+        if (posBottom === 'bottom') {
+            var a_bottom = document.documentElement.scrollTop + document.getElementsByClassName(targetBottom)[keyBottom].getBoundingClientRect().bottom;
+        } else {
+            var a_bottom = document.documentElement.scrollTop + document.getElementsByClassName(targetBottom)[keyBottom].getBoundingClientRect().top;
+        }
+        var a_height = a_bottom - a_top;
+        var ctop = (top + cheight) - a_top;
+        var reading_rate = (ctop / a_height) * 100;
+
+        if(hostEnv.env === 'stg' || hostEnv.env === 'dev') console.log(hostEnv);
+
+        return reading_rate;
+    }
+    var getJsonLd = function(){
+        var jsonld = document.getElementById('jsonld') || {};
+        if(jsonld){
+            var textContent = jsonld.textContent;
+            textContent = textContent.replace(/\\n/g, "\\n")
+                                                            .replace(/\\'/g, "\\'")
+                                                            .replace(/\\"/g, '\\"')
+                                                            .replace(/\\&/g, "\\&")
+                                                            .replace(/\\r/g, "\\r")
+                                                            .replace(/\\t/g, "\\t")
+                                                            .replace(/\\b/g, "\\b")
+                                                            .replace(/\\f/g, "\\f");
+            textContent = textContent.replace(/[\u0000-\u001f]+/g,"");
+            jsonld = JSON.parse(textContent);
+            return jsonld;
+        }
+        return {};
+    }
+    //rateは読了率を示し，rate0は読了率0％を示している．
+    var rate0 = 0, rate10 = 0, rate20 = 0, rate25 = 0, rate30 = 0, rate40 = 0, rate50 = 0, rate60 = 0, rate70 = 0, rate75 =0, rate80 = 0, rate90 = 0, rate100 = 0;
+    var infoImage = function (rate) {
+        var hostEnv = getHostEnv();
+        var img = document.createElement('img');
+        var read_rate = rate; var url = getUrl(); var ck = getCookie('_td') || '';
+        var jsonld = getJsonLd();
+        var mgContentsCode = jsonld.contentscode || '';
+        var database = 'mg_media';
+        if (hostEnv.env === 'stg') {
+            database = 'stg_mg_media';
+        } else if (hostEnv.env === 'dev') {
+            database = 'dev_mg_media';
+        }
+        img.src = 'https://in.treasuredata.com/postback/v3/event/' + database + '/reading_rate?td_format=pixel&td_write_key=9257/d1680901bb7d256f5428cdb7e210d1320e3ffc78&td_global_id=td_global_id&td_ip=td_ip&td_ua=td_ua&event_type=scroll_percentage' + '&event_value=' + read_rate + '&url=' + url + '&td_client_id=' + ck + '&contentscode=' + mgContentsCode;
+        img.width = 1; img.height = 1; img.style.display = 'none';
+        if(hostEnv.env === 'stg' || hostEnv.env === 'dev') console.log('scroll_rate = ' + rate + '%');
+    }
+    var getUrl = function () { return window.location.href ? encodeURIComponent(window.location.href) : ''; }
+    var getCookie = function (k) { var cs = document.cookie; if (cs) { var acs = cs.split('; '); for (var i = 0, length = acs.length; i < length; i++) { var cs = acs[i].split('='); if (cs[0] === k) { return cs[1]; } } } }
+    var getReadingRate = function () {
+        try {
+            var jsonld = getJsonLd();
+            if (jsonld.pageType != 'article') return;
+
+            var reading_rate = setReadingRate();
+            var rate = '';
+
+            if (rate10 == 0 && reading_rate >= 10) {
+            rate = 10; rate10 = 1; infoImage(rate);
+            } else if (rate20 == 0 && reading_rate >= 20) {
+            rate = 20; rate20 = 1; infoImage(rate);
+            } else if (rate25 == 0 && reading_rate >= 25) {
+            rate = 25; rate25 = 1; infoImage(rate);
+            } else if (rate30 == 0 && reading_rate >= 30) {
+            rate = 30; rate30 = 1; infoImage(rate);
+            } else if (rate40 == 0 && reading_rate >= 40) {
+            rate = 40; rate40 = 1; infoImage(rate);
+            } else if (rate50 == 0 && reading_rate >= 50) {
+            rate = 50; rate50 = 1; infoImage(rate);
+            } else if (rate60 == 0 && reading_rate >= 60) {
+            rate = 60; rate60 = 1; infoImage(rate);
+            } else if (rate70 == 0 && reading_rate >= 70) {
+            rate = 70; rate70 = 1; infoImage(rate);
+            } else if (rate75 == 0 && reading_rate >= 75) {
+            rate = 75; rate75 = 1; infoImage(rate);
+            } else if (rate80 == 0 && reading_rate >= 80) {
+            rate = 80; rate80 = 1; infoImage(rate);
+            } else if (rate90 == 0 && reading_rate >= 90) {
+            rate = 90; rate90 = 1; infoImage(rate);
+            } else if (rate100 == 0 && reading_rate >= 100) {
+            rate = 100; rate100 = 1; infoImage(rate);
+            } else if (rate100 == 1) {
+            return true;
+            }
+            setTimeout(function () { getReadingRate() }, 500);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+    getReadingRate();
+})();

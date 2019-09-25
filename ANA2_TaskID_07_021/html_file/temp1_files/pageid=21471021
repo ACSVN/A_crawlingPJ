@@ -1,0 +1,2 @@
+document.writeln("<!-- <IMG SRC=\"http://img.ak.impact-ad.jp/ai/AEAI3.gif\" ALT=\"\" BORDER=\"0\"> -->");
+document.close();

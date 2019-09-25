@@ -1,0 +1,461 @@
+var LOGIN_IFRAME_HEIGHT = 621;
+$(function () {
+
+  // GA Click
+  $(".ga_click").click(function () {
+    var url = this.href;
+    var c = $(this).attr("class");
+    var class_names = c.split(" ");
+    var box_name = class_names[1];
+    ga('send', 'event', "LinkClick", box_name, url);
+  });
+
+  if ((typeof is_iphone != "undefined" && is_iphone) || (typeof is_wphone != "undefined" && is_wphone)) {
+    //$("#SpTopBg").show();
+  }
+
+  // 検索ボックス
+  $("#universalSearchBox").click(function () {
+    if ($(this).val() == $(this).attr("rel"))
+      $(this).val("");
+  });
+
+  // パネル回答
+  $("#panel_show_other_replies").click(function (e) {
+    e.preventDefault();
+    $(this).hide();
+    $("#panel_other_replies").slideDown("slow");
+  });
+
+  // ブログポストを報告
+  $("#report_blog_post").click(function (e) {
+    e.preventDefault();
+    window.open("https://s.japan.cnet.com/contact/blog/blog.htm?entry=" + $(this).attr("rel"), "ブログ報告", "width=480,height=500,scrollbars=yes,status=yes");
+  });
+
+  var login_cookie = getCookie("CNET_ID_LOGINED");
+  if (login_cookie != "") {
+    $(".loginAction .menuHead")
+      .attr("href", "https://s.japan.cnet.com/membership/")
+      .html("Myページ <span></span>");
+
+    $(".loggedOut").hide();
+    $(".loggedIn").show();
+
+  }
+
+  // はてなブックマーク IE7/IE8
+  if (navigator.appVersion.indexOf("MSIE 7.0") !== -1 || navigator.appVersion.indexOf("MSIE 8.0") !== -1) {
+    $("#hatena_iefix").show();
+    $("#sbm_hatena iframe").css("display", "none");
+  }
+
+  $("iframe.vine-embed").height(450);
+
+  setTimeout(function () {
+    var alert_cookie = getCookie("cnetid_alert_header_disp");
+
+    if (login_cookie == "1" && $("#block_elu").css("display") !== "none" && location.protocol == "http:" && location.href.indexOf("/membership/") < 0) {
+      $("body").prepend('<div id="cnetid_alert_header">CNET_IDのご登録情報を最後に更新してから長期間が経過しています。<a href="https://s.japan.cnet.com/membership/">こちら</a>から更新をお願いいたします。</div>');
+      $("#cnetid_alert_header").fadeIn("slow");
+    } else if (login_cookie == "0" && alert_cookie != "" && $("#block_elu").css("display") !== "none" && location.protocol == "http:" && location.href.indexOf("/membership/") < 0) {
+      $("body").prepend('<div id="cnetid_alert_header">CNET_ID会員情報を追加登録することで更なるサービスが利用できます。登録は<a href="https://s.japan.cnet.com/membership/">こちら</a>から。</div>');
+      $("#cnetid_alert_header").fadeIn("slow");
+      setCookie("cnetid_alert_header_disp", "/", "1", 14, '.japan.cnet.com', false);
+    }
+  }, 1000);
+
+  $(window).scroll(function () {
+
+    if (login_cookie && (login_cookie == "1" || login_cookie == "0") && $("#block_elu").css("display") !== "none" && $('#cnetid_alert_header').length > 0 && location.protocol == "http:" && location.href.indexOf("/membership/") < 0) {
+      if ($(window).scrollTop() > $('#cnetid_alert_header').offset().top || $('#cnetid_alert_header').offset().top > 0) {
+        $('#cnetid_alert_header').addClass('cnetid_alert_header_fixed');
+      } else {
+        $('#cnetid_alert_header').removeClass('cnetid_alert_header_fixed');
+      }
+    }
+  });
+
+  $(".more-navigation").css("display", "none");
+
+  $("li.content-menu-more").click(function () {
+    $(".more-navigation").fadeToggle(200);
+  });
+
+
+  if (login_cookie != "") {
+    $(".js-log-out").hide();
+
+  } else {
+    $(".js-log-in").hide();
+  }
+
+  $('.searchBtnD .searchBtn')
+    .focusin(function (e) {
+      $(this).css('background-image', 'none');
+    })
+    .focusout(function (e) {
+      if ($(this).val() == '') {
+        $(this).css('background-image', 'url(//cse.google.com/cse/intl/ja/images/google_custom_search_watermark.gif)');
+      }
+    });
+
+  $('.search-box-resp .searchBtn')
+    .focusin(function (e) {
+      $(this).css('background-image', 'none');
+    })
+    .focusout(function (e) {
+      if ($(this).val() == '') {
+        $(this).css('background-image', 'url(//cse.google.com/cse/intl/ja/images/google_custom_search_watermark.gif)');
+      }
+    });
+
+  var topBtn = $('#pageTop');
+  topBtn.hide();
+
+  $(window).scroll(function () {
+    if ($(this).scrollTop() > 200) {
+      topBtn.fadeIn();
+    } else {
+      topBtn.fadeOut();
+    }
+  });
+
+  topBtn.click(function () {
+    $('body,html').animate({
+      scrollTop: 0
+    }, 500);
+    return false;
+  });
+
+  //responsive menu
+  $('#header-wrap-resp .header-nav-search > span').click(function () {
+    $('#header-wrap-resp .header-nav-search > .search-box-resp').toggleClass("active_search");
+    $('#header-wrap-resp .menu-id').removeClass("active_id");
+    $('#nav-wrap-resp .menu-primary').removeClass("active_primary");
+    $('#nav-wrap-resp .menu-category').removeClass("active_category");
+    $('#nav-wrap-resp .menu-share').removeClass("active_share");
+  });
+  $('#header-wrap-resp .header-nav-id > span').click(function () {
+    $('#header-wrap-resp .search-box-resp').removeClass("active_search");
+    $('#header-wrap-resp .menu-id').toggleClass("active_id");
+    $('#nav-wrap-resp .menu-primary').removeClass("active_primary");
+    $('#nav-wrap-resp .menu-category').removeClass("active_category");
+    $('#nav-wrap-resp .menu-share').removeClass("active_share");
+  });
+  $('#nav-wrap-resp li.nav-menu > span').click(function () {
+    $('#header-wrap-resp .search-box-resp').removeClass("active_search");
+    $('#header-wrap-resp .menu-id').removeClass("active_id");
+    $('#nav-wrap-resp .menu-primary').toggleClass("active_primary");
+    $('#nav-wrap-resp .menu-category').removeClass("active_category");
+    $('#nav-wrap-resp .menu-share').removeClass("active_share");
+  });
+  $('#nav-wrap-resp li.nav-category > span').click(function () {
+    $('#header-wrap-resp .search-box-resp').removeClass("active_search");
+    $('#header-wrap-resp .menu-id').removeClass("active_id");
+    $('#nav-wrap-resp .menu-primary').removeClass("active_primary");
+    $('#nav-wrap-resp .menu-category').toggleClass("active_category");
+    $('#nav-wrap-resp .menu-share').removeClass("active_share");
+  });
+  $('#nav-wrap-resp li.nav-marketers > span').click(function () {
+    $('#header-wrap-resp .search-box-resp').removeClass("active_search");
+    $('#header-wrap-resp .menu-id').removeClass("active_id");
+    $('#nav-wrap-resp .menu-primary').removeClass("active_primary");
+    $('#nav-wrap-resp .menu-category').removeClass("active_category");
+    $('#nav-wrap-resp .menu-share').removeClass("active_share");
+    location.href = "/marketers/";
+  });
+  $('#nav-wrap-resp li.nav-share > span').click(function () {
+    $('#header-wrap-resp .search-box-resp').removeClass("active_search");
+    $('#header-wrap-resp .menu-id').removeClass("active_id");
+    $('#nav-wrap-resp .menu-primary').removeClass("active_primary");
+    $('#nav-wrap-resp .menu-category').removeClass("active_category");
+    $('#nav-wrap-resp .menu-share').toggleClass("active_share");
+  });
+  if ($('#editor_recommend').length > 0){
+    $('#editor_sp_link').parent().show();
+    $('#editor_sp_link').click(function(){
+      $('#nav-wrap-resp .menu-primary').toggleClass("active_primary");
+    });
+  }else{
+    $('#editor_sp_link').parent().hide();
+  }
+
+  $("#archive_navi").click(function(event){archive_navigation(event)});
+
+  if ($("#kl_login").length > 0) {
+    var storyId = $("#ck_ans").val();
+    var cookie = getCookie("ans_" + storyId);
+
+    if (getCookie("CNET_ID_LOGINED") &&
+      getCookie("CNET_ID_TOKEN")) {
+      if (cookie === "approval") {
+        showdialogbutton(false);
+      } else {
+        showdialogbutton(true);
+      }
+      $(".msg_login").hide();
+    } else {
+      showdialogbutton(true);
+    }
+  }
+
+
+  /*  */
+  if (document.cookie.indexOf('is_gdpr_agree') === -1) {
+    /*  */
+    $("#gdpr_area").fadeIn('slow');
+  }
+
+  $('.gdpr_btn_agree').click(function () {
+    /*  */
+    document.cookie = "is_gdpr_agree=1;domain=.japan.cnet.com;path=/;expires=Fri, 31 Dec 9999 23:59:59 GMT";
+    /*  */
+    $("#gdpr_area").fadeOut('slow');
+  });
+});
+
+
+function checkLogin() {
+  return getCookie("CNET_ID_LOGINED");
+}
+
+
+function processAction(ahref) {
+  if (!checkLogin()) {
+    dialogopen(ahref, LOGIN_IFRAME_HEIGHT);
+    login_timeout = setTimeout(function () {
+      modalLoginCheck(ahref);
+    }, 1000);
+    return;
+  }
+  window.location.href = ahref;
+}
+
+
+function modalLoginCheck(ahref) {
+  if (checkLogin()) {
+    dialog_close();
+    window.location.href = ahref;
+  }
+  else {
+    login_timeout = setTimeout(function () {
+      modalLoginCheck(ahref);
+    }, 2000);
+  }
+}
+
+function story_alert_signup(val, pos) {
+
+  return false;
+}
+
+/*  */
+function show_mini_site(story_id) {
+
+  var mini_url = "https://m.japan.cnet.com/";
+
+  if (story_id) {
+    mini_url = mini_url + "story/" + story_id + "/";
+  }
+
+  setCookie("SELECTED_CNET_SITE", "/", "mini", 365, '.japan.cnet.com', false);
+  location.href = mini_url;
+}
+function getCookie(key) {
+  var cookieString = document.cookie;
+  var cookieKeyArray = cookieString.split(";");
+  for (var i = 0; i < cookieKeyArray.length; i++) {
+    var targetCookie = cookieKeyArray[i];
+    targetCookie = targetCookie.replace(/^\s+|\s+$/g, "");
+    var valueIndex = targetCookie.indexOf("=");
+    if (targetCookie.substring(0, valueIndex) == key) {
+      return unescape(targetCookie.slice(valueIndex + 1));
+    }
+  }
+  return "";
+}
+function setCookie(c_name, path, value, expiredays, domain, secure) {
+  var extime = new Date().getTime();
+  var cltime = new Date(extime + (60 * 60 * 24 * 1000 * expiredays));
+  var exdate = cltime.toUTCString();
+  var s = "";
+  s += c_name + "=" + escape(value);
+  s += "; path=" + path;
+  if (expiredays) {
+    s += "; expires=" + exdate;
+  }
+  if (domain) {
+    s += "; domain=" + domain;
+  }
+  if (secure == true) {
+    s += "; Secure";
+  }
+
+  document.cookie = s;
+}
+$(document).on('click', 'a', function () {
+  var category = $(this).data('ga_category');
+  if (category !== undefined && category != '') {
+    var label = $(this).data('ga_label');
+    if (label == undefined || label == '') {
+      label = $(this).attr('href');
+    }
+    ga('send', 'event', category, 'click', label);
+  }
+});
+$(document).on('click', 'input', function () {
+  var category = $(this).data('ga_category');
+  if (category !== undefined && category != '') {
+    var label = $(this).data('ga_label');
+    if (label == undefined || label == '') {
+      label = location.href;
+    }
+    ga('send', 'event', category, 'click', label);
+  }
+  return true;
+});
+$(document).on('click', 'button', function () {
+  var category = $(this).data('ga_category');
+  if (category !== undefined && category != '') {
+    var label = $(this).data('ga_label');
+    if (label == undefined || label == '') {
+      label = location.href;
+    }
+    ga('send', 'event', category, 'click', label);
+  }
+  return true;
+});
+
+function archive_navigation(e) {
+  e.preventDefault();
+  $(".navigation_box").toggle();
+}
+
+function enquete_require_check() {
+  var ret = true;
+  jQuery.each($(".form_q[name='req']"), function () {
+    var req_id = $(this).attr("id")
+    var first_tag = $("[name='" + req_id + "']:first");
+    var isErr = false;
+    if (first_tag.length == 0) {
+      //checkbox
+      first_tag = $("[name='" + req_id + "[]']:first");
+    }
+    switch (first_tag.get(0).tagName) {
+      case "INPUT":
+        switch (first_tag.attr("type")) {
+          case "text":
+            if (first_tag.val().length == 0) {
+              isErr = true;
+            }
+            break;
+          case "radio":
+            if ($("input[name=" + req_id + "]:checked").length == 0) {
+              isErr = true;
+            }
+            break;
+          case "checkbox":
+            if ($("input[name=" + req_id + "[]]:checked").length == 0) {
+              isErr = true;
+            }
+            break;
+        }
+        break;
+      case "TEXTAREA":
+        if (first_tag.val().length == 0) {
+          isErr = true;
+        }
+        break;
+    }
+    if (isErr) {
+      $("#error_" + req_id).show();
+      ret = false;
+    } else {
+      $("#error_" + req_id).hide();
+    }
+  });
+  return ret;
+}
+
+function setToken() {
+  $("#download_form :first").before(
+    "<input type='hidden' name='token' value='" + getCookie("CNET_ID_TOKEN") + "'>"
+  );
+}
+function processActionKeyLeaf(ahref) {
+  if (!checkLogin()) {
+    dialogopen(ahref + "&layout=responsive_dialog", LOGIN_IFRAME_HEIGHT);
+    login_timeout = setTimeout(function () {
+      modalLoginCheckKeyLeaf(ahref);
+    }, 1000);
+    return;
+  }
+  window.location.href = ahref;
+}
+
+
+function modalLoginCheckKeyLeaf(ahref) {
+  if (checkLogin()) {
+    dialog_close();
+    window.location.href = ahref;
+  }
+  else {
+    login_timeout = setTimeout(function () {
+      modalLoginCheckKeyLeaf(ahref);
+    }, 2000);
+  }
+}
+
+
+function showdialogbutton(show){
+  if (show){
+    $(".key_chain_active").hide();
+    $(".key_chain_disable").show();
+  }else{
+    $(".key_chain_active").show();
+    $(".key_chain_disable").hide();
+  }
+}
+
+function checkShowDialog(dialog_url, page){
+  if(checkLogin()) {
+    var storyId = $("#ck_ans").val();
+    url = '/direct/story_lead/' + storyId + '/check.htm';
+    $.ajax({
+      type: 'GET',
+      url: url,
+      dataType: 'json',
+      success: function (data) {
+        if (data.status == true) {
+          if (data.isGot == true) {
+            location.href = '/article/' + storyId + '/p/' + page + '/';
+          } else {
+            dialogopen(dialog_url);
+          }
+        } else {
+          dialogopen(dialog_url);
+        }
+      }
+    });
+  }else{
+    dialogopen(dialog_url);
+  }
+}
+
+function setWP(bg, url) {
+
+  $("body").css("background", "#ffffff url('" + bg + "') no-repeat top");
+  $("body").css("background-position", "center " + $("#AAMB1").offset().top + "px");
+  $("#page-wrap").css("background-color", "#ffffff");
+
+  $(document).on("click", "#wrap", function () {
+    window.open(url);
+  });
+  $("#wrap").css("cursor", "pointer");
+
+  $(document).on("click", "#header-wrap, #header-wrap-resp, #nav-wrap-resp, #page-wrap, #slider", function (e) {
+    e.stopPropagation();
+  });
+  $("#header-wrap, #header-wrap-resp, #nav-wrap-resp, #page-wrap, #slider").css("cursor", "default");
+}
