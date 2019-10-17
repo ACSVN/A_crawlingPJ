@@ -1,4 +1,3 @@
-//save page source
 Press "Ctrl+S"
 Wait "2s"
 Press "Ctrl+Right"
@@ -11,6 +10,6 @@ Press "Delete"
 Var _SERVER_CLIPBOARD_CONTENT="{fullPathHtml}"
 Press "Ctrl+V"
 Wait "2s"
+
 Press "Enter"
 Wait "10s"
-

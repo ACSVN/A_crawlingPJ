@@ -1,24 +1,24 @@
-                        Log {result_status}
-                        if({result_status} > 1){
-                            Var status="Data storage exist data"
-                            Var keyword={keyword{i}}
-                            Var total_href=0
-                        }else if({result_status} == 1){
-                            Var status="Success"
-                            Var keyword={keyword{i}}
-                            Var total_href={total_href}
-                        }else{
-                            Var status="Error"
-                            Var keyword={keyword{i}}
-                            Var total_href=0
-                        }
+Log {result_status}
 
-//                        Var status="Success"
-                        Run "..\..\src\ANA2\JP\SaveWebError.java"
+if ({result_status} > 1) {
+    Var status="Data storage exist data"
+    Var keyword={keyword{i}}
+    Var total_href=0
+} else if ({result_status} == 1) {
+    Var status="Success"
+    Var keyword={keyword{i}}
+    Var total_href={total_href}
+} else {
+    Var status="Error"
+    Var keyword={keyword{i}}
+    Var total_href=0
+}
 
-//                        Run "..\src\ana\SaveWebError.java"
-                        Log {check_path}
-                        Log {stus}
-                        Log {check_write}
-                        Wait 2s
-                        Press "Ctrl+W"
+Run "..\..\src\ANA2\JP\SaveWebError.java"
+
+Log {check_path}
+Log {stus}
+Log {check_write}
+Wait 2s
+
+Press "Ctrl+W"
