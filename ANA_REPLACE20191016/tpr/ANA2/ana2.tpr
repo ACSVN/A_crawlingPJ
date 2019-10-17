@@ -1,110 +1,124 @@
-  Var k=0
-  Log {_PROJECT_DIR}
-  Var path_error={_PROJECT_DIR}
-  Run "..\..\src\ANA2\JP\LoadKeywords.java"
+Var k=0
+Log {_PROJECT_DIR}
+Var path_error={_PROJECT_DIR}
 
-//  Run "..\src\JP\LoadKeywords.java"
-  Log {total_keyword}
-  
-  Run "..\..\src\ANA2\JP\CopyFile.java"
-//  Run "..\src\JP\CopyFile.java"
-  Log {fullPathOutFile}
+Run "..\..\src\ANA2\JP\LoadKeywords.java"
+Log {total_keyword}
 
-  Var _SERVER_CLIPBOARD_CONTENT={url_web}
-  Press F6
-  Press "Ctrl+T"
-  Press "Ctrl+V"
-  Wait "0.5s"
-  Press "Delete"
-  Press Enter
-  Wait "1s"
-  
-  String "indexof" {web_name} string="newswitch" var="login1"
-  String "indexof" {web_name} string="nikkan" var="login2"
-  String "indexof" {web_name} string="gizmodo" var="web_gizmodo"
-  String "indexof" {web_name} string="nikkei" var="web_nikkei"
+Run "..\..\src\ANA2\JP\CopyFile.java"
+Log {fullPathOutFile}
 
-  Var flag=0
-  if(({login1} >= 0 || {login2} >= 0) && {boolean_login} == 0){
+
+# ===== Paste URL & Go to Top-Page ===== #
+Var _SERVER_CLIPBOARD_CONTENT={url_web}
+Press F6
+Press "Ctrl+T"
+Press "Ctrl+V"
+Wait "0.5s"
+
+Press "Delete"
+Press Enter
+Wait "1s"
+
+String "indexof" {web_name} string="newswitch" var="login1"
+String "indexof" {web_name} string="nikkan" var="login2"
+String "indexof" {web_name} string="gizmodo" var="web_gizmodo"
+String "indexof" {web_name} string="nikkei" var="web_nikkei"
+
+
+# ===== newswitch, nikkan flag ===== #
+Var flag=0
+
+# ===== newswitch, nikkan login ===== #
+if (({login1} >= 0 || {login2} >= 0) && {boolean_login} == 0) {
     Compareto "{web_name}\login\login.png" method="search2"
+
     if ({_EXIT_CODE} == 0) {
-        //Click "image" passrate="50" template="{web_name}\{web_name}{j}.png"
         Compareto "{web_name}\login\login.png" method="search2"
         if ({_EXIT_CODE} > 0) {
             Var flag=1
-        }else{
+        } else {
             Click "image" passrate="50" template="{web_name}\login\login.png"
             Wait "2s"
+
             Compareto "{web_name}\login\user.png" method="search2"
+
             if ({_EXIT_CODE} > 0) {
                 Var flag=1
-            }else{
+            } else {
                 Click "image" passrate="50" template="{web_name}\login\user.png"
                 Var _SERVER_CLIPBOARD_CONTENT="quoc.nguyen@addix.vn"
                 Press "Ctrl+V"
                 Wait "10s"
+
                 Press tab
-                // Click "image" passrate="50" template="{web_name}\login\pass.png"
                 Var _SERVER_CLIPBOARD_CONTENT="addix12"
                 Press "Ctrl+V"
                 Wait "1s"
+
                 Press enter
-                // Click "image" passrate="50" template="{web_name}\login\submit.png"
                 Wait "2s"
-                if({login1} >= 0){
+
+                if ({login1} >= 0) {
                     Compareto "{web_name}\login\home.png" method="search2"
                     if ({_EXIT_CODE} > 0) {
                         Var flag=1
-                    }else{
+                    } else {
                         Click "image" passrate="50" template="{web_name}\login\home.png"
                     }
                 }
-                
                 Eval boolean_login=1
-                
             }
-            
-
-            
-
         }
-
     }
-  }
-  Log {flag}
-  Var flagimg=0
-  Var flagimg1=0
-  if({flag} < 1){
-        
-      for (i=1; {i}<{total_keyword}; i={i}+1) {
-//        for (i=1; {i}<3; i={i}+1) {
+}
+
+# if "login.png" or "user.png" not found, flag will be changed from 0 to 1
+Log {flag}
+
+
+# ===== keyword textbox flag ===== #
+Var flagimg=0
+
+# ===== nikkei flag ===== #
+Var flagimg1=0
+
+# ===== if newswitch, nikkan image found (flag=0) ===== #
+if ({flag} < 1) {
+    for (i=1; {i}<{total_keyword}; i={i}+1) {
         Var number_pages=0
         Var _SERVER_CLIPBOARD_CONTENT={url_web}
+
         Press F6
         Press "Ctrl+T"
         Press "Ctrl+V"
         Wait "0.5s"
+
         Press "Delete"
         Press Enter
         Wait "15s"
-        
+
         for (j=0; {j}<{click_search}; j={j}+1) {
             Compareto "{web_name}\{web_name}{j}.png" method="search2"
             if ({_EXIT_CODE} > 0) {
                 Var flagimg=1
-            }else{
+            } else {
                 Click "image" passrate="75" template="{web_name}\{web_name}{j}.png" wait="500"
                 Wait "5s"
             }
-
         }
         Log {flagimg}
-        if({flagimg} < 1){
+
+
+        # ===== if keyword textbox image found (flagimg=0) ===== #
+        if ({flagimg} < 1) {
             Press "Ctrl+A"
             Press "Delete"
+
             # Read value keyword
             Var keyword={keyword{i}}
             Log {keyword}
+
             Var _SERVER_CLIPBOARD_CONTENT={keyword}
             Press "Ctrl+V"
             Press "Enter"
@@ -114,86 +128,86 @@
                 Compareto "{web_name}\sort\{web_name}{srt}.png" method="search2"
                 if ({_EXIT_CODE} > 0) {
                     Var flagimg=1
-                    
-                }else{
+                } else {
                     Click "image" passrate="70" template="{web_name}\sort\{web_name}{srt}.png"
-                    //      Click "image" passrate="75" template="techcrunch\sort\techcrunch1.PNG"
                     Wait "2s"
                     Var flagimg=0
                 }
-
             }
             Log {flagimg}
-            if({flagimg} < 1){
+
+            # ===== if keyword textbox image found (flagimg=0) ===== #
+            if ({flagimg} < 1) {
                 Var file_html="temp1.html"
+
                 Run "..\..\src\ANA2\JP\DeleteFileExist.java"
-//                Run "..\src\JP\DeleteFileExist.java"
                 Log {fullPathHtml}
 
+                # ===== gizmodo search ===== #
                 if({web_gizmodo} >= 0){
-                   Press "PGDOWN" wait="500" count=5
+                    Press "PGDOWN" wait="500" count=5
                 }
 
-                if({web_nikkei} >= 0){
-                //Compareto "{web_name}\visit.png" passrate="70" method="search2"
-                //if ({_EXIT_CODE} > 0) {
-                //    Click "image" passrate="30" template="{web_name}\visit.png"
-                //}
-                Var found=0
-                for (foundii=1; {foundii}<30; foundii={foundii}+1) {
-                    Compareto "{web_name}\google_icon.png" passrate="70" method="search2"
-                    if ({_EXIT_CODE} > 0) {
-                        Press "PAGEDOWN"
-
-//                        Press "PGDOWN" wait="500"
-                        Var flagimg1=1
-                    } else {
+                # ===== nikkei search ===== #
+                if ({web_nikkei} >= 0) {
+                    Var found=0
+                    for (foundii=1; {foundii}<30; foundii={foundii}+1) {
                         Compareto "{web_name}\google_icon.png" passrate="70" method="search2"
-                        if ({_EXIT_CODE} == 0) {
-                           Click "image" passrate="30" template="{web_name}\google_icon.png"
-                           Wait "5s"
-                           Var found=1
-                           Var flagimg1=0
-                           Break
+                        if ({_EXIT_CODE} > 0) {
+                            Press "PAGEDOWN"
+                            Var flagimg1=1
+                        } else {
+                            Compareto "{web_name}\google_icon.png" passrate="70" method="search2"
+                            if ({_EXIT_CODE} == 0) {
+                                Click "image" passrate="30" template="{web_name}\google_icon.png"
+                                Wait "5s"
+                                Var found=1
+                                Var flagimg1=0
+                                Break
+                            }
                         }
                     }
                 }
-                }
+                # if "nikkei/google_icon.png" not found, flag will be changed from 0 to 1
+                # if HCR used "PGDOWN" and found png, flag will be changed to 0
                 Log {flagimg1}
-                if({flagimg1} < 1){
+
+
+                # ===== save pagesource of pageNo1 (unique for ANA2, compared with ANA1) ===== #
+                if ({flagimg1} < 1) {
                     Wait "5s"
+
                     Run "savepagesource.tpr"
-                    //    Wait "10s"
+
                     for (i0=0; {i0} <= 1000;i0={i0}+1) {
                         Compareto "completed.png" passrate="70" method="search2"
                         if ({_EXIT_CODE} > 0) {
                             Wait 1s
-
-                        }else{
+                        } else {
                             Click "image" passrate="75" template="close_completed.PNG"
-
                             break
                         }
                     }
                     Run "..\..\src\ANA2\JP\GetNumberPage.java"
-//                    Run "..\src\JP\GetNumberPage.java"
                     Log {number_pages}
 
-                    if({number_pages} > 1){
+
+                    # ====== if pages are more than 2 ===== #
+                    if ({number_pages} > 1) {
                         for (k=2; {k}<3; k={k}+1) {
+
+                            # ===== go-next-page image flag ===== #
                             Var found=0
                             for (foundii=1; {foundii}<30; foundii={foundii}+1) {
                                 Var link="{web_name}\click_page\click{k}.png"
                                 Log {link}
+
                                 Compareto "{web_name}\click_page\google_icon.png" passrate="70" method="search2"
-                                // Compareto "techcrunch\click_page\google_icon.png" passrate="70" method="search2"
                                 if ({_EXIT_CODE} > 0) {
-//                                    Press DOWN
-                                      Press "PAGEDOWN"
-//                                    Press "PGDOWN" wait="500"
+                                    Press "PAGEDOWN"
                                     Var flagimg2=1
                                 } else {
-                                        Compareto "{link}" passrate="70" method="search2"
+                                    Compareto "{link}" passrate="70" method="search2"
                                     if ({_EXIT_CODE} == 0) {
                                         Click "image" passrate="70" template="{link}"
                                         Wait "5s"
@@ -203,19 +217,21 @@
                                     }
                                 }
                             }
-                            if({found} == 1){
+
+                            # ===== save pagesource of pageNo{k} (unique for ANA2, compared with ANA1) ===== #
+                            if ({found} == 1) {
                                 Log {k}
-                                //Click "image" passrate="30" template="{web_name}\click_page\click{k}.png"
                                 Wait "5s"
+
                                 Var file_html="temp{k}.html"
-                                
+
                                 Run "..\..\src\ANA2\JP\GetPathHTML.java"
-//                                Run "..\src\JP\GetPathHTML.java"
                                 Log {fullPathHtml}
 
                                 Log {file_html}
                                 Run "savepagesource.tpr"
-                                for (i2=0; {i2} <= 1000;i2={i2}+1) {
+
+                                for (i2=0; {i2} <= 1000; i2={i2}+1) {
                                     Compareto "completed.png" passrate="70" method="search2"
                                     if ({_EXIT_CODE} > 0) {
                                         Wait 1s
@@ -227,26 +243,29 @@
                             }
                         }
                     }
+                    # if "{website}/google_icon.png" not found, flag will be changed from 0 to 1
+                    # if HCR used "PGDOWN" and found png, flag will be changed to 0
                     Log {flagimg2}
-                    if({flagimg2} < 1){
+
+                    # ===== if pages are not more than 2, or finished for more than 2 pages, Get href data ===== #
+                    if ({flagimg2} < 1) {
                         Run "..\..\src\ANA2\JP\GetHref.java"
-//                        Run "..\src\JP\GetHref.java"
                         Log {total_href}
                         Log {check_detail}
                         Log {content}
-
                         Wait "3s"
+
                         Excel "open" file="..\..\href.xlsx" id="id3"
-
-//                        Excel "open" file="..\..\src\href.xlsx" id="id3"
-
                         Excel "select" sheet="Sheet1" id="id3"
+
                         Var result_status=0
+
                         for (k=2; {k}<{count_loop}+2; k={k}+1) {
                             Log {k}
+
                             # Read url item
                             Excel select row={k} column="1" id="id3"
-                            Var str_url_item_tmp={_EXCEL_CELL_VALUE} 
+                            Var str_url_item_tmp={_EXCEL_CELL_VALUE}
 
                             # Read title item
                             Excel select row={k} column="2" id="id3"
@@ -256,127 +275,93 @@
 
                             String "indexof" {str_url_item_tmp} string="null" var="result1"
                             String "indexof" {str_url_item_tmp} string="EXCEL_CELL_VALUE" var="result2"
-                            
-                            if({result1} < 0 && {result2} < 0){
-//                                Var _SERVER_CLIPBOARD_CONTENT={str_url_item_tmp}
-//                                Press F6
-//                                Press "Ctrl+T"
-//                                Press "Ctrl+V"
-//                                Wait "2s"
-//                                Press "Delete"
-//                                Press Enter
-//                                Wait "5s"
-//                                Var path_save_html=""
-//                                Run "..\src\JP\GetPathSaveHTML.java"
-//                                Wait "10s"
-//                                Log {path_save_html}
-//                                Log {k}
-                                //
-                                //
-//                                //save page source
-//                                Press "Ctrl+S"
-//                                Wait "2s"
-//                                Press "Ctrl+Right"
-//                                Press "Ctrl+A"
-//                                Press "Ctrl+C"
-//
-//                                Var page_name={_SERVER_CLIPBOARD_CONTENT_TEXT}
-//                                String replace "{page_name}" string="\"" replacement=" "
-//                                Var page_name={_STRING}
-//                                Press "Delete"
-//
-//                                Wait "5s"
-//                                Var _SERVER_CLIPBOARD_CONTENT="{path_save_html}\{keyword}\({no_num}){page_name}"
-//                                Log {_SERVER_CLIPBOARD_CONTENT}
-//                                Press "Ctrl+V"
-//                                Wait "2s"
-//                                Press "Enter"
-//                                Wait "20s"
-//                                for (i3=0; {i3} <= 1000;i3={i3}+1) {
-//                                    Compareto "completed.png" passrate="70" method="search2"
-//                                    if ({_EXIT_CODE} > 0) {
-//                                        Wait 1s
-//                                    }else{
-//                                        break
-//                                    }
-//                                }            
-//                                Press "Ctrl+W"
+
+                            if ({result1} < 0 && {result2} < 0) {
                                 Var result_status=2
                             }
                             Run "..\..\src\ANA2\JP\GetContent.java"
-//                            Run "..\src\JP\GetContent.java"
-                            
                             Log {check_detail}
                         }
+
+                        # ===== Use HTTrack ===== #
                         Press Windows+r
                         Paste "C:\Program Files (x86)\WinHTTrack\WinHTTrack.exe"
                         Press enter
                         Wait 3s
+
                         Press alt+n
                         Paste {web_name}
                         Press tab
                         Press tab
                         Paste {_PROJECT_DIR}\data_page_source\HTML\{web_name}
                         Press enter
+
                         for (get=2; {get}<{count_loop}+2;get={get}+1) {
-                           Excel select row={get} column="1" id="id3"
+                            Excel select row={get} column="1" id="id3"
                             Var urlhttr={_EXCEL_CELL_VALUE}
+
                             String "indexof" {urlhttr} string="null" var="texturl"
                             String "indexof" {urlhttr} string=" " var="texturl2"
                             String "indexof" {urlhttr} string="null" var="result3"
                             String "indexof" {urlhttr} string="_EXCEL_CELL_VALUE" var="result4"
-                            Log {result3}
-                            if({result3} < 0 && {result4} < 0){
-                                    if({texturl} < 0 && {texturl2} < 0){
-                                         Paste {urlhttr}
-                                         Press enter
-                                    }
-                            }
 
+                            Log {result3}
+
+                            if ({result3} < 0 && {result4} < 0) {
+                                if ({texturl} < 0 && {texturl2} < 0) {
+                                    Paste {urlhttr}
+                                    Press enter
+                                }
+                            }
                         }
-//                        Excel "close" save="false" id="id3"
+
                         Press tab count=7
                         Press enter
-                        Press enter 
+                        Press enter
                         Press Alt+tab
-                        Wait 3s 
+                        Wait 3s
+
                         Excel "close" save="false" id="id3"
                         Log {path_error}
-                        Run "SaveWebError.tpr"
-                    }else{
-                        Run "SaveWebError.tpr"
 
+                        Run "SaveWebError.tpr"
+                    } else {
+                        # not "flaging2 < 1"
+                        Run "SaveWebError.tpr"
                     }
-                }else{
+                } else {
+                    # not "flaging1 < 1"
                     Run "SaveWebError.tpr"
                 }
-            }else{
+            } else {
+                # not "flaging < 1" (??? why flaging used 2 times? from nose)
                 Run "SaveWebError.tpr"
             }
-        }else{
+        } else {
+            # not "flaging < 1"
             Run "SaveWebError.tpr"
-            }  
-      }    
- }else{
-     Run "SaveWebError.tpr"
- }
-  if({login1} >= 0 && {boolean_login} == 1){
+        }
+    }
+} else {
+    # not "flag < 1"
+    Run "SaveWebError.tpr"
+}
+
+
+if ({login1} >= 0 && {boolean_login} == 1) {
     Compareto "{web_name}\login\icon.png" passrate="70" method="search2"
     if ({_EXIT_CODE} > 0) {
         Wait 1s
-//        break
-    }else{    
+    } else {
         Click "image" passrate="50" template="{web_name}\login\icon.png"
         Wait "1s"
         Compareto "{web_name}\login\logout.png" passrate="70" method="search2"
-            if ({_EXIT_CODE} > 0) {
-                Wait 1s
-//                break
-            }else{
-                Click "image" passrate="50" template="{web_name}\login\logout.png"
-            }
-        
+        if ({_EXIT_CODE} > 0) {
+            Wait 1s
+        } else {
+            Click "image" passrate="50" template="{web_name}\login\logout.png"
+        }
     }
+}
 
-  }
-  Press "Ctrl+W"
+Press "Ctrl+W"
