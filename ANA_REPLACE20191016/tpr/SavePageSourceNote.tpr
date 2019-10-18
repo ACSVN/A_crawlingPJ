@@ -1,159 +1,157 @@
-//                                    Excel "open" file="..\href.xlsx" id="id5"
-                                    Var result_status=0
-                                    Excel "open" file="D:\RPA\ANA\ANA_201908\ANA_PJ\ANA_REPLACE\src\href.xlsx" id="id5"
-                                    Excel "select" sheet="Sheet1" id="id5"
-                                    Var result_status=0
-                                    Var website_nwpt=0
-                                    String "indexof" {web_name} string="nikkei" var="nikkei_website"
-                                    String "indexof" {web_name} string="wired" var="wired_website"
-                                    String "indexof" {web_name} string="prtime" var="prtime_website"
-                                    String "indexof" {web_name} string="techable" var="techable_website"
+Var result_status=0
 
-                                    if({nikkei_website} >= 0 ||{wired_website} >= 0 ||{prtime_website} >= 0 ||{techable_website} >=0){
-                                        Var website_nwpt=0
-                                    }else{
-                                        Var website_nwpt=1
-                                    }
-                                    if({website_nwpt} <= 0){
-                                        for (k=2; {k}<{count_loop}+2; k={k}+1) {
-                                            Log {k}
-                                            # Read url item
-                                            Excel select row={k} column="1" id="id5"
-                                            Var str_url_item_tmp={_EXCEL_CELL_VALUE} 
+Excel "open" file="D:\RPA\ANA\ANA_201908\ANA_PJ\ANA_REPLACE\src\href.xlsx" id="id5"
+Excel "select" sheet="Sheet1" id="id5"
 
-                                            # Read title item
-                                            Excel select row={k} column="2" id="id5"
-                                            Var str_title_item={_EXCEL_CELL_VALUE}
+Var result_status=0
+Var website_nwpt=0
 
-                                            Eval no_num={k}-1
+String "indexof" {web_name} string="nikkei" var="nikkei_website"
+String "indexof" {web_name} string="wired" var="wired_website"
+String "indexof" {web_name} string="prtime" var="prtime_website"
+String "indexof" {web_name} string="techable" var="techable_website"
 
-                                            String "indexof" {str_url_item_tmp} string="null" var="result1"
-                                            String "indexof" {str_url_item_tmp} string="EXCEL_CELL_VALUE" var="result2"
+if ({nikkei_website} >= 0 ||{wired_website} >= 0 ||{prtime_website} >= 0 ||{techable_website} >=0) {
+    Var website_nwpt=0
+} else {
+    Var website_nwpt=1
+}
 
+if ({website_nwpt} <= 0) {
+    for (k=2; {k}<{count_loop}+2; k={k}+1) {
+        Log {k}
+        # Read url item
+        Excel select row={k} column="1" id="id5"
+        Var str_url_item_tmp={_EXCEL_CELL_VALUE}
 
-                                            
-                                                      if({result1} < 0 && {result2} < 0){
-                                                        Var _SERVER_CLIPBOARD_CONTENT={str_url_item_tmp}
-                                                        Press F6
-                                                        Press "Ctrl+T"
-                                                        Press "Ctrl+V"
-                                                        Wait "2s"
-                                                        Press "Delete"
-                                                        Press Enter
-                                                        Wait "5s"
-                                                        Var path_save_html=""
-                                                        Run "..\src\ANA1\ana\GetPathSaveHTML.java"
+        # Read title item
+        Excel select row={k} column="2" id="id5"
+        Var str_title_item={_EXCEL_CELL_VALUE}
 
-//                                                        Run "..\src\JP\GetPathSaveHTML.java"
-                                                        Wait "10s"
-                                                        Log {path_save_html}
-                                                        Log {k}
-                                                        
-                                                        
-//                                                        save page source
-                                                        Press "Ctrl+S"
-                                                        Wait "2s"
-                                                        Press "Ctrl+Right"
-                                                        Press "Ctrl+A"
-                                                        Press "Ctrl+C"
-                        
-                                                        Var page_name={_SERVER_CLIPBOARD_CONTENT_TEXT}
-                                                        String replace "{page_name}" string="\"" replacement=" "
-                                                        Var page_name={_STRING}
-                                                        Press "Delete"
-                        
-                                                        Wait "5s"
-                                                        Var _SERVER_CLIPBOARD_CONTENT="{path_save_html}\{keyword}\({no_num}){page_name}"
-                                                        Log {_SERVER_CLIPBOARD_CONTENT}
-                                                        Press "Ctrl+V"
-                                                        Wait "2s"
-                                                        Press "Enter"
-                                                        Wait "20s"
-                                                        for (i3=0; {i3} <= 1000;i3={i3}+1) {
-                                                            Compareto "completed.png" passrate="70" method="search2"
-                                                            if ({_EXIT_CODE} > 0) {
-                                                                Wait 1s
-                                                           }else{
-                                                                break
-                                                           }
-                                                        }            
-                                                       Press "Ctrl+W"
-                                                }
+        Eval no_num={k}-1
 
-                                                    Var result_status=2
-                                                    Run "..\src\ANA2\JP\GetContent.java"
-                                                    Log {check_detail}
-                                        }
-                                        
-                                    }
+        String "indexof" {str_url_item_tmp} string="null" var="result1"
+        String "indexof" {str_url_item_tmp} string="EXCEL_CELL_VALUE" var="result2"
 
-                                        
+        if ({result1} < 0 && {result2} < 0) {
+            Var _SERVER_CLIPBOARD_CONTENT={str_url_item_tmp}
+            Press F6
+            Press "Ctrl+T"
+            Press "Ctrl+V"
+            Wait "2s"
 
-                                        
-                                       
-                                        
-                                        
-                                     
-                                    if({website_nwpt} > 0){
-                                        for (k=2; {k}<{count_loop}+2; k={k}+1) {
-                                            Log {k}
-                                            # Read url item
-                                            Excel select row={k} column="1" id="id5"
-                                            Var str_url_item_tmp={_EXCEL_CELL_VALUE} 
+            Press "Delete"
+            Press Enter
+            Wait "5s"
 
-                                            # Read title item
-                                            Excel select row={k} column="2" id="id5"
-                                            Var str_title_item={_EXCEL_CELL_VALUE}
+            Var path_save_html=""
+            Run "..\src\ANA1\ana\GetPathSaveHTML.java"
 
-                                            Eval no_num={k}-1
+            Wait "10s"
+            Log {path_save_html}
+            Log {k}
 
-                                            String "indexof" {str_url_item_tmp} string="null" var="result1"
-                                            String "indexof" {str_url_item_tmp} string="EXCEL_CELL_VALUE" var="result2"
-                                            if({result1} < 0 && {result2} < 0){
-                                                Var result_status=1
-                                            }else{
-                                                Var result_status=0
-                                            }
-                                        }
-                                        if({result_status} > 0){
-                                            Press Windows+r
-                                            Paste "C:\Program Files (x86)\WinHTTrack\WinHTTrack.exe"
-                                            Press enter
-                                            Wait 3s
-                                            Press alt+n
-                                            Paste {web_name}
-                                            Press tab
-                                            Press tab
-                                            Paste {_PROJECT_DIR}\data_page_source\HTML\{web_name}
-                                            Press enter
-                                            for (get=2; {get}<{count_loop}+2;get={get}+1) {
-                                               Excel select row={get} column="1" id="id5"
-                                                Var urlhttr={_EXCEL_CELL_VALUE}
-                                                String "indexof" {urlhttr} string="null" var="texturl"
-                                                String "indexof" {urlhttr} string=" " var="texturl2"
-                                                String "indexof" {urlhttr} string="null" var="result3"
-                                                String "indexof" {urlhttr} string="_EXCEL_CELL_VALUE" var="result4"
-                                                Log {result3}
-                                                if({result3} < 0 && {result4} < 0){
-                                                        if({texturl} < 0 && {texturl2} < 0){
-                                                             Paste {urlhttr}
-                                                             Press enter
-                                                        }
-                                                }
+            Press "Ctrl+S"
+            Wait "2s"
+            Press "Ctrl+Right"
+            Press "Ctrl+A"
+            Press "Ctrl+C"
 
-                                            }
-                                            Excel "close" save="false" id="id5"
-                                            Press tab count=7
-                                            Press enter
-                                            Press enter 
-                                            Press Alt+tab
-                                            Wait 3s 
-                                            
-                                            Log {path_error}
-                                            Run "ANA2\SaveWebError.tpr"
-                                        }
+            Var page_name={_SERVER_CLIPBOARD_CONTENT_TEXT}
+            String replace "{page_name}" string="\"" replacement=" "
+            Var page_name={_STRING}
+            Press "Delete"
 
-                                    
-                                    }
-                                    Excel "close" save="false" id="id5"
+            Wait "5s"
+            Var _SERVER_CLIPBOARD_CONTENT="{path_save_html}\{keyword}\({no_num}){page_name}"
+            Log {_SERVER_CLIPBOARD_CONTENT}
+            Press "Ctrl+V"
+            Wait "2s"
 
+            Press "Enter"
+            Wait "20s"
+
+            for (i3=0; {i3} <= 1000;i3={i3}+1) {
+                Compareto "completed.png" passrate="70" method="search2"
+                if ({_EXIT_CODE} > 0) {
+                    Wait 1s
+                }else{
+                    break
+                }
+            }
+            Press "Ctrl+W"
+        }
+        Var result_status=2
+        Run "..\src\ANA2\JP\GetContent.java"
+        Log {check_detail}
+    }
+}
+
+if ({website_nwpt} > 0) {
+    for (k=2; {k}<{count_loop}+2; k={k}+1) {
+        Log {k}
+
+        # Read url item
+        Excel select row={k} column="1" id="id5"
+        Var str_url_item_tmp={_EXCEL_CELL_VALUE}
+
+        # Read title item
+        Excel select row={k} column="2" id="id5"
+        Var str_title_item={_EXCEL_CELL_VALUE}
+
+        Eval no_num={k}-1
+
+        String "indexof" {str_url_item_tmp} string="null" var="result1"
+        String "indexof" {str_url_item_tmp} string="EXCEL_CELL_VALUE" var="result2"
+
+        if ({result1} < 0 && {result2} < 0) {
+            Var result_status=1
+        } else {
+            Var result_status=0
+        }
+    }
+
+    if ({result_status} > 0) {
+        Press Windows+r
+        Paste "C:\Program Files (x86)\WinHTTrack\WinHTTrack.exe"
+        Press enter
+        Wait 3s
+
+        Press alt+n
+        Paste {web_name}
+        Press tab
+        Press tab
+        Paste {_PROJECT_DIR}\data_page_source\HTML\{web_name}
+        Press enter
+
+        for (get=2; {get}<{count_loop}+2;get={get}+1) {
+            Excel select row={get} column="1" id="id5"
+            Var urlhttr={_EXCEL_CELL_VALUE}
+
+            String "indexof" {urlhttr} string="null" var="texturl"
+            String "indexof" {urlhttr} string=" " var="texturl2"
+            String "indexof" {urlhttr} string="null" var="result3"
+            String "indexof" {urlhttr} string="_EXCEL_CELL_VALUE" var="result4"
+            Log {result3}
+
+            if ({result3} < 0 && {result4} < 0) {
+                if ({texturl} < 0 && {texturl2} < 0) {
+                    Paste {urlhttr}
+                    Press enter
+                }
+            }
+        }
+        Excel "close" save="false" id="id5"
+
+        Press tab count=7
+        Press enter
+        Press enter
+        Press Alt+tab
+        Wait 3s
+
+        Log {path_error}
+        Run "ANA2\SaveWebError.tpr"
+    }
+}
+
+Excel "close" save="false" id="id5"
