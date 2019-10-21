@@ -57,13 +57,16 @@ public class LoadKeywords extends DefaultJavaTestScript  {
             while(rowIt.hasNext()) {
                 Row row = rowIt.next();
                 Cell cell = row.getCell(0);
+                Cell cell2 = row.getCell(1);
                 if(web_name.indexOf("gigazine") >= 0){
                     if(cell.getStringCellValue().length() > 2){
                         getContext().setVariable("keyword"+i, cell.getStringCellValue());
+                        getContext().setVariable("keyname"+i, cell2.getStringCellValue());
                         i++;
                     }
                 }else{
                     getContext().setVariable("keyword"+i, cell.getStringCellValue());
+                    getContext().setVariable("keyname"+i, cell2.getStringCellValue());
                     i++;
                 }
             }

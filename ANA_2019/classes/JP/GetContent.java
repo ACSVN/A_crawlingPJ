@@ -159,14 +159,14 @@ public class GetContent extends DefaultJavaTestScript  {
     try{
 
         String No = getContext().getVariableAsString("no_num");
-		String url_htt="";
-		if(url_item.indexOf("http://") >= 0){
-			url_htt=url_item.replace("http://", "");
+        String url_htt="";
+        if(url_item.indexOf("http://") >= 0){
+            url_htt=url_item.replace("http://", "");
 
-		}else if(url_item.indexOf("https://") >= 0){
-			url_htt=url_item.replace("https://", "");
-		}
-		String linkurl = "https://vp-web-crawl"+".s3-ap-northeast1.amazonaws.com/"+"20190920HTTrack/"+url_htt+"index.html";
+        }else if(url_item.indexOf("https://") >= 0){
+            url_htt=url_item.replace("https://", "");
+        }
+        String linkurl = "https://vp-web-crawl"+".s3-ap-northeast1.amazonaws.com/"+"20190920HTTrack/"+url_htt+"index.html";
         File excelFile = new File(path_out_file);
         FileInputStream fis = new FileInputStream(excelFile);
 
@@ -187,11 +187,11 @@ public class GetContent extends DefaultJavaTestScript  {
         row.createCell(6).setCellValue(date_posts);
         row.createCell(7).setCellValue(sources);
         row.createCell(8).setCellValue(contents);
-		if(url_htt.length <=0){
-			row.createCell(9).setCellValue(url_htt);
-		}else{
-			row.createCell(9).setCellValue(linkurl);
-		}
+                if(url_htt.length() <=0){
+            row.createCell(9).setCellValue(url_htt);
+        }else{
+            row.createCell(9).setCellValue(linkurl);
+        }
 
         fis.close();
         FileOutputStream output_file =new FileOutputStream(new File(path_out_file));
