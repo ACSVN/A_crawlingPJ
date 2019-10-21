@@ -11,6 +11,6 @@
 <sotype2>classes</sotype2>
 </paths>
 <tver>5.0.1-20190308.1</tver>
-<lastmod>18-10-19 14:33</lastmod>
-<editors>tpr\ANA_main.tpr;tpr\ANA1\mainANA1.tpr;tpr\ANA2\mainANA2.tpr;tpr\ANA2\savepagesourceANA2.tpr;src\JP\GetContent.java;tpr\Getdatawebsite.tpr</editors>
+<lastmod>21-10-19 11:15</lastmod>
+<editors>src\ana\GetContent.java;tpr\Getdatawebsite.tpr;src\JP\GetContent.java;tpr\ANA2\savepagesourceANA2.tpr;tpr\ANA2\mainANA2.tpr;tpr\ANA1\mainANA1.tpr;tpr\ANA_main.tpr</editors>
 </tprproject>
