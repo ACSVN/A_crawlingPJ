@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><tprproject>
+<date>16-10-19 14:15</date>
+<uid>p16dd36c155f</uid>
+<ver>1</ver>
+<paths>
+<reports>reports</reports>
+<templates>templates</templates>
+<schedules>schedules</schedules>
+<stype1>tpr</stype1>
+<stype2>src</stype2>
+<sotype2>classes</sotype2>
+</paths>
+<tver>5.0.1-20190308.1</tver>
+<lastmod>18-10-19 14:33</lastmod>
+<editors>tpr\ANA_main.tpr;tpr\ANA1\mainANA1.tpr;tpr\ANA2\mainANA2.tpr;tpr\ANA2\savepagesourceANA2.tpr;src\JP\GetContent.java;tpr\Getdatawebsite.tpr</editors>
+</tprproject>

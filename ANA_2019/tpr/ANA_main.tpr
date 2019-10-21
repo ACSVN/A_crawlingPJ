@@ -1,0 +1,186 @@
+Var web_name=""
+Var url=""
+Var url_web=""
+Var class_href=""
+Var class_title=""
+Var class_date_post=""
+Var class_source=""
+Var class_content=""
+Var click_search=""
+Var class_next_page=""
+Var domain=""
+Var replace_nxt_p=""
+Var case_display=""
+Var class_tr_dl=""
+Var click_sort=""
+Var flag=0
+Var flagimg=0
+Var flagimg1=0
+Var input_file="input_main.xlsx"
+Var out_file="output.xlsx"
+Var sheet_keyword="key_search"
+Var keyword=""
+Var total_keyword=0
+Var total_href=0
+Var keyname=""
+Var str_url_item_tmp=""
+Var str_title_item=""
+Var fullPathOutFile=""
+Var path_save=""
+Var path_save_html=""
+Var special_char=""
+Var page_name=""
+Var check_path=""
+Var count_loop=20
+Eval no_num=0
+Var found=0.
+Var numpage=0
+
+Var stus=""
+Var status=""
+Var result_status=0
+Var check_detail=""
+Var flag=0
+Var flagimg=0
+Var flagimg1=0
+Var flagimg2=0
+Var flagimg3=0
+Var flagimg4=0
+Var types=0
+Var k=0
+Var file_html=""
+Var result_status=0
+Var website_nwpt=0
+Excel "open" file="..\input_main.xlsx" id="id1"
+
+
+if({_EXIT_CODE} > 0){
+    Exit 1
+}
+
+Excel "select" sheet="URL" id="id1"
+
+Press Windows+r wait=1s
+Type "chrome"
+Press Enter wait=1s
+Press "Windows+UP"
+Wait "0.5s"
+
+for (index=3; {index}<={_EXCEL_SHEET_ROWS};index={index}+1) {
+//for (index=8; {index}<11;index={index}+1) {
+    # Read value name website
+    Excel select row={index} column="1" id="id1"
+    Var web_name={_EXCEL_CELL_VALUE}
+    
+    # Read value url of website
+    Excel select row={index} column="2" id="id1"
+    Var url_web={_EXCEL_CELL_VALUE}
+    
+    # Read class href of website
+    Excel select row={index} column="3" id="id1"
+    Var class_href={_EXCEL_CELL_VALUE}
+    
+    # Read class title 
+    Excel select row={index} column="4" id="id1"
+    Var class_title={_EXCEL_CELL_VALUE}
+    
+    # Read class date post article 
+    Excel select row={index} column="5" id="id1"
+    Var class_date_post={_EXCEL_CELL_VALUE}
+    
+    # Read class source article
+    Excel select row={index} column="6" id="id1"
+    Var class_source={_EXCEL_CELL_VALUE}
+    
+    # Read class content of article
+    Excel select row={index} column="7" id="id1"
+    Var class_content={_EXCEL_CELL_VALUE}
+    
+    # Read number click mouse to input key search
+    Excel select row={index} column="8" id="id1"
+    Var click_search={_EXCEL_CELL_VALUE}
+    
+    # Read class page when click next page
+    Excel select row={index} column="9" id="id1"
+    Var class_next_page={_EXCEL_CELL_VALUE}
+    
+    # Read domian of website
+    Excel select row={index} column="10" id="id1"
+    Var domain={_EXCEL_CELL_VALUE}
+    
+    # Read string replace when click next page
+    Excel select row={index} column="11" id="id1"
+    Var replace_nxt_p={_EXCEL_CELL_VALUE}
+    
+    # Read number item on a page
+    Excel select row={index} column="12" id="id1"
+    Var case_display={_EXCEL_CELL_VALUE}
+    
+    # Read class child of div
+    Excel select row={index} column="13" id="id1"
+    Var class_tr_dl={_EXCEL_CELL_VALUE}
+    
+    # Read value times click sort data with date
+    Excel select row={index} column="14" id="id1"
+    Var click_sort={_EXCEL_CELL_VALUE}
+    
+    # Read class gsc cursor page
+    Excel select row={index} column="15" id="id1"
+    Var class_gsc_cursor_page={_EXCEL_CELL_VALUE}
+    
+    # Read type get data websites
+    Excel select row={index} column="16" id="id1"
+    Var types={_EXCEL_CELL_VALUE}
+    Log {types}
+    Log {web_name}
+    Log {url_web}
+    Log {class_href}
+    Log {class_title}
+    if({types} <= 1){
+        Run "..\src\ana\CopyFile.java"
+        Run "..\src\ana\LoadKeywords.java"
+        
+
+        Log {total_keyword}
+    }else{
+        Run "..\src\JP\CopyFile.java"
+
+        Run "..\src\JP\LoadKeywords.java"
+        Log {total_keyword}
+    }
+    String "indexof" {web_name} string="nikkan" var="nikkan"
+    String "indexof" {web_name} string="nikkei" var="nikkei"
+    String "indexof" {web_name} string="wired" var="wired"
+    String "indexof" {web_name} string="techable" var="techable"
+    String "indexof" {web_name} string="prtimes" var="prtimes"
+    if({nikkan} > 0 || {nikkei} > 0 || {wired} > 0 || {techable} > 0 || {prtimes} > 0){
+        Var website_nwpt=1
+    }else{
+        Var website_nwpt=0
+    }
+    for (i=1; {i}<{total_keyword}; i={i}+1) {
+        
+        if({types} <= 1){
+            Run "ANA1\mainANA1.tpr"
+
+        }else{
+            Run "ANA2\mainANA2.tpr"
+
+
+        }
+
+//        String "indexof" {str_url_item_tmp} string="" var="result2"
+//        String "indexof" {str_url_item_tmp} string="null" var="result"
+//        String "indexof" {str_url_item_tmp} string="_EXCEL_CELL_VALUE" var="result2"
+        Run "Getdatawebsite.tpr"
+
+
+
+    }
+
+    
+
+    
+
+}
+Excel "close" save="false" id="id1"
