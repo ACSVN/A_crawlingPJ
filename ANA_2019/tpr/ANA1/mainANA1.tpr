@@ -1,251 +1,218 @@
+Var _SERVER_CLIPBOARD_CONTENT={url_web}
+
+Press F6
+Press "Ctrl+T"
+Press "Ctrl+V"
+Wait "1s"
+Press "Delete"
+Press Enter
+Wait "2s"
+
+String "indexof" {web_name} string="gigazine" var="web_exist"
+String "indexof" {web_name} string="roboteer" var="roboteer_exist"
+String "indexof" {web_name} string="newswitch" var="login"
 
 
-    
-//    Run "..\..\src\ana\LoadKeywords.java"
-//    Log {total_keyword}
-    //
-//    Run "..\..\src\ana\CopyFile.java"
-//    Log {fullPathOutFile}
-    
-    Var _SERVER_CLIPBOARD_CONTENT={url_web}
-    Press F6
-    Press "Ctrl+T"
-    Press "Ctrl+V"
-    Wait "1s"
-    Press "Delete"
-    Press Enter
-    Wait "2s"
-    String "indexof" {web_name} string="gigazine" var="web_exist"
-    String "indexof" {web_name} string="roboteer" var="roboteer_exist"
-    String "indexof" {web_name} string="newswitch" var="login"
+Var flag=0
 
-    Var flag=0
-    if({login} >= 0){
-//        Click "image" passrate="50" template="{web_name}\{web_name}{j}.png"
-        Compareto "{web_name}\login\login.png" passrate="70" method="search2"
+if ({login} >= 0) {
+    Compareto "{web_name}\login\login.png" passrate="70" method="search2"
+    if ({_EXIT_CODE} > 0) {
+        Var flag=1
+    } else {
+        Click "image" passrate="50" template="{web_name}\login\login.png"
+        Wait "10s"
+        Compareto "{web_name}\login\user.png" passrate="70" method="search2"
+
         if ({_EXIT_CODE} > 0) {
             Var flag=1
         } else {
-            
-                Click "image" passrate="50" template="{web_name}\login\login.png"
-                Wait "10s"
-                Compareto "{web_name}\login\user.png" passrate="70" method="search2"
-                
-                if ({_EXIT_CODE} > 0) {
-                   Var flag=1
-                } else {
-                    Click "image" passrate="50" template="{web_name}\login\user.png"
-                    Var _SERVER_CLIPBOARD_CONTENT="quoc.nguyen@addix.vn"
-                    Press "Ctrl+V"
-                    Wait "5s"
-                    Press tab
-                    //        Click "image" passrate="50" template="{web_name}\login\pass.png"
-                    Var _SERVER_CLIPBOARD_CONTENT="addix12"
-                    Press "Ctrl+V"
-                    Wait "5s"
-                    Press enter   
-                    //        Click "image" passrate="50" template="{web_name}\login\submit.png"
-                    Wait "10s"
-                    Compareto "{web_name}\login\user.png" passrate="70" method="search2"
-                    if ({_EXIT_CODE} > 0) {
-                       Var flag=1
-                   } else {
-                       Click "image" passrate="50" template="{web_name}\login\home.png"
-                   }
+            Click "image" passrate="50" template="{web_name}\login\user.png"
 
-
-                }
-
-        }     
-    }
-    Log {flag}
-    if( {flag} < 1) {
-        Var flagimg=0   
-        if({web_exist} >= 0){
-            //Click "image" passrate="50" template="gigazine\home.png"
-            Compareto "gigazine\home" passrate="70" method="search2"
-            if ({_EXIT_CODE} > 0) {
-                Var flagimg=1
-            } else {
-                Click "image" passrate="50" template="gigazine\home"
-            }
-            
-        }
-        Var flagimg1=0
-        Log {flagimg}
-        if({flagimg} < 1){
-//        for (i=1; {i}<{total_keyword}; i={i}+1) {
-            Var _SERVER_CLIPBOARD_CONTENT={url_web}
-            Press F6
-            Press "Ctrl+T"
+            Var _SERVER_CLIPBOARD_CONTENT="quoc.nguyen@addix.vn"
             Press "Ctrl+V"
-            Wait "1s"
-            Press "Delete"
-            Press Enter
+
+            Wait "5s"
+            Press tab
+            Var _SERVER_CLIPBOARD_CONTENT="addix12"
+            Press "Ctrl+V"
+
+            Wait "5s"
+            Press enter
+
             Wait "10s"
-            if({roboteer_exist} >= 0){
-                    //Click "image" passrate="50" template="gigazine\home.png"
-                        Compareto "roboteer\roboteer1.PNG" passrate="70" method="search2"
-
-                        if ({_EXIT_CODE} > 0) {
-                           Var flagimg1=1
-                        } else {
-
-                           Click "image" template="roboteer\roboteer1.PNG"
-                           Var flagimg1=0
-                        }
-
+            Compareto "{web_name}\login\user.png" passrate="70" method="search2"
+            if ({_EXIT_CODE} > 0) {
+                Var flag=1
+            } else {
+                Click "image" passrate="50" template="{web_name}\login\home.png"
             }
-            Log {flagimg1}
-            if({flagimg1} < 1){
-                    Var flagimg2=0
-                    for (j=0; {j}<{click_search}; j={j}+1) {
-                    if ({web_exist} >= 0 || {roboteer_exist} >= 0) {
-                        Var found=0
-                        for (foundi=1; {foundi}<11; foundi={foundi}+1) {
-                            Compareto "{web_name}\{web_name}{j}.png" method="search2"
-                            if ({_EXIT_CODE} > 0) {
-                                Press "PGDOWN" wait="500"
-                                Var flagimg2=1
-                            } else {
-                                Click "image" passrate="50" template="{web_name}\{web_name}{j}.png" wait="500"
-                                Wait "5s"
-                                Var found=1
-                                Var flagimg2=0
-                                Break
-                            }
-                        }
-                    }else{
+        }
+    }
+}
+
+Log {flag}
+
+
+if ({flag} < 1) {
+    Var flagimg=0
+    if ({web_exist} >= 0) {
+        Compareto "gigazine\home" passrate="70" method="search2"
+        if ({_EXIT_CODE} > 0) {
+            Var flagimg=1
+        } else {
+            Click "image" passrate="50" template="gigazine\home"
+        }
+    }
+
+    Var flagimg1=0
+    Log {flagimg}
+    if ({flagimg} < 1) {
+        Var _SERVER_CLIPBOARD_CONTENT={url_web}
+        Press F6
+        Press "Ctrl+T"
+        Press "Ctrl+V"
+        Wait "1s"
+        Press "Delete"
+        Press Enter
+        Wait "10s"
+        if ({roboteer_exist} >= 0) {
+            Compareto "roboteer\roboteer1.PNG" passrate="70" method="search2"
+            if ({_EXIT_CODE} > 0) {
+                Var flagimg1=1
+            } else {
+                Click "image" template="roboteer\roboteer1.PNG"
+                Var flagimg1=0
+            }
+        }
+        Log {flagimg1}
+
+
+        if ({flagimg1} < 1) {
+            Var flagimg2=0
+            for (j=0; {j}<{click_search}; j={j}+1) {
+                if ({web_exist} >= 0 || {roboteer_exist} >= 0) {
+                    Var found=0
+                    for (foundi=1; {foundi}<11; foundi={foundi}+1) {
                         Compareto "{web_name}\{web_name}{j}.png" method="search2"
                         if ({_EXIT_CODE} > 0) {
-                                    Var flagimg2=1
-                                    } else {
-
-                                      Click "image" passrate="50" template="{web_name}\{web_name}{j}.png" wait="500"
-                                       Wait "5s"
-                                        Var flagimg2=0
-                                    }
-
-                    }
-                }
-                Log {flagimg2}
-                if({flagimg2} < 1){
-                    Var flagimg3=0
-                    Press "Ctrl+A"
-                    Press "Delete"
-                    # Read value keyword
-                    Var keyword={keyword{i}}
-                    Var keyname={keyname{i}}
-                    Log {keyword}
-                    Log {keyname}
-                    Var _SERVER_CLIPBOARD_CONTENT={keyword}
-                    Press "Ctrl+V"
-                    Press "Enter"
-                    Wait "5s"
-
-                    for (srt=0; {srt}<{click_sort}; srt={srt}+1) {
-                        Compareto "{web_name}\sort\{web_name}{srt}.png" method="search2"
-                        if ({_EXIT_CODE} > 0) {
-                            Var flagimg3=1
-                        }else{
-                            Click "image" passrate="50" template="{web_name}\sort\{web_name}{srt}.png"
-                            Wait "1s"
+                            Press "PGDOWN" wait="500"
+                            Var flagimg2=1
+                        } else {
+                            Click "image" passrate="50" template="{web_name}\{web_name}{j}.png" wait="500"
+                            Wait "5s"
+                            Var found=1
+                            Var flagimg2=0
+                            Break
                         }
-                        
-
                     }
-                    if({web_exist} >= 0){
-                        Wait "10s"
+                } else {
+                    Compareto "{web_name}\{web_name}{j}.png" method="search2"
+                    if ({_EXIT_CODE} > 0) {
+                        Var flagimg2=1
+                    } else {
+                        Click "image" passrate="50" template="{web_name}\{web_name}{j}.png" wait="500"
+                        Wait "5s"
+                        Var flagimg2=0
                     }
-                    Log {flagimg3}
-                    if({flagimg3} < 1){
-                        Press F6
-                        Press "Ctrl+C"
-                        Var url={_SERVER_CLIPBOARD_CONTENT_TEXT}
-                        //        Press F6
-                        //        Press F6
-                        Var numpage=0
+                }
+            }
+            Log {flagimg2}
 
-                        Run "..\..\src\ana\GetHref.java"
-                        Log {numpage}
-                        Log {total_href}
-                        Log {check_detail}
-                        Log {url}       
 
-                        
-                    }else{
-                        Var keyword={keyword{i}}
-                            Var total_href="0"
-                            Var status="Error"
-                            Run "..\..\src\ana\SaveWebError.java"
-                            Log {check_path}
-                            Log {stus}
-                            Log {check_write}
-                            Press "Ctrl+W"
+            if ({flagimg2} < 1) {
+                Var flagimg3=0
+                Press "Ctrl+A"
+                Press "Delete"
+
+                # Read value keyword
+                Var keyword={keyword{i}}
+                Var keyname={keyname{i}}
+                Log {keyword}
+                Log {keyname}
+
+                Var _SERVER_CLIPBOARD_CONTENT={keyword}
+                Press "Ctrl+V"
+                Press "Enter"
+                Wait "5s"
+
+                for (srt=0; {srt}<{click_sort}; srt={srt}+1) {
+                    Compareto "{web_name}\sort\{web_name}{srt}.png" method="search2"
+                    if ({_EXIT_CODE} > 0) {
+                        Var flagimg3=1
+                    } else {
+                        Click "image" passrate="50" template="{web_name}\sort\{web_name}{srt}.png"
+                        Wait "1s"
                     }
-
-
-                    
-                }else{
-                    Var keyword={keyword{i}}
-                        Var total_href="0"
-                        Var status="Error"
-                        Run "..\..\src\ana\SaveWebError.java"
-                        Log {check_path}
-                        Log {stus}
-                        Log {check_write}
-                        Press "Ctrl+W"
-                    
                 }
 
-                }else{
-                    Var keyword={keyword{i}}
-                        Var total_href="0"
-                        Var status="Error"
-                        Run "..\..\src\ana\SaveWebError.java"
-                        Log {check_path}
-                        Log {stus}
-                        Log {check_write}
-                        Press "Ctrl+W"
+                if ({web_exist} >= 0) {
+                    Wait "10s"
                 }
+                Log {flagimg3}
 
-//            }
-            
-        }else{
-            Var keyword={keyword{i}}
-                Var total_href="0"
-                Var status="Error"
-                Run "..\..\src\ana\SaveWebError.java"
-                Log {check_path}
-                Log {stus}
-                Log {check_write}
-                Press "Ctrl+W"
-        }
-    }else{
+
+                if ({flagimg3} < 1) {
+                    Press F6
+                    Press "Ctrl+C"
+                    Var url={_SERVER_CLIPBOARD_CONTENT_TEXT}
+                    Var numpage=0
+
+                    Run "..\..\src\ana\GetHref.java"
+                    Log {numpage}
+                    Log {total_href}
+                    Log {check_detail}
+                    Log {url}
+                } else {
+                    Var keyword={keyword{i}}
+                    Var total_href="0"
+                    Var status="Error"
+                    Run "..\..\src\ana\SaveWebError.java"
+                    Log {check_path}
+                    Log {stus}
+                    Log {check_write}
+                    Press "Ctrl+W"
+                }
+            } else {
                 Var keyword={keyword{i}}
                 Var total_href="0"
                 Var status="Error"
                 Run "..\..\src\ana\SaveWebError.java"
-
-//                Run "..\..\..\src\ana\SaveWebError.java"
                 Log {check_path}
                 Log {stus}
                 Log {check_write}
                 Press "Ctrl+W"
+            }
+        } else {
+            Var keyword={keyword{i}}
+            Var total_href="0"
+            Var status="Error"
+            Run "..\..\src\ana\SaveWebError.java"
+            Log {check_path}
+            Log {stus}
+            Log {check_write}
+            Press "Ctrl+W"
+        }
+    } else {
+        Var keyword={keyword{i}}
+        Var total_href="0"
+        Var status="Error"
+        Run "..\..\src\ana\SaveWebError.java"
+        Log {check_path}
+        Log {stus}
+        Log {check_write}
+        Press "Ctrl+W"
     }
-
-
-    
-
-    
-    
-
-//    if({login} >= 0){
-//        Click "image" passrate="50" template="{web_name}\login\icon.png"
-//        Wait "1s"
-//        Click "image" passrate="50" template="{web_name}\login\logout.png"
-//    }
+} else {
+    Var keyword={keyword{i}}
+    Var total_href="0"
+    Var status="Error"
+    Run "..\..\src\ana\SaveWebError.java"
+    Log {check_path}
+    Log {stus}
+    Log {check_write}
     Press "Ctrl+W"
+}
 
+Press "Ctrl+W"
 Wait "10s"
-//Press "Ctrl+Shift+W"
