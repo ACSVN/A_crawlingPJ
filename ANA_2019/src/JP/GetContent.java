@@ -11,7 +11,13 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.text.*;
-
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
+import java.util.Date;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -157,16 +163,27 @@ public class GetContent extends DefaultJavaTestScript  {
   
   public void writeDataToFile(String path_out_file, String sheeName, String web_name, String url_web, String keyword, String url_item, String title, String date_posts, String sources, String contents){
     try{
+		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        
+        String str = formatter.format(date).toString();
+  
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateTime = LocalDate.parse(str, formatter1);
+        
+        String fridayString = dateTime.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).toString();
+        fridayString = fridayString.replace("-", "");
+		String url_htt = "";
+		if(url_item.indexOf("https://") >= 0){
+			url_htt = url_item.replace("https://", "");
+		}else if(url_item.indexOf("http://") >= 0){
+			url_htt = url_item.replace("http://", "");
+		}
+
+		String linkURL="https://s3.console.aws.amazon.com/s3/buckets/avatar-rpa-products/"+ fridayString + "HTTrack/"+url_htt+"index.html";
 
         String No = getContext().getVariableAsString("no_num");
-        String url_htt="";
-        if(url_item.indexOf("http://") >= 0){
-            url_htt=url_item.replace("http://", "");
 
-        }else if(url_item.indexOf("https://") >= 0){
-            url_htt=url_item.replace("https://", "");
-        }
-        String linkurl = "https://vp-web-crawl"+".s3-ap-northeast1.amazonaws.com/"+"20190920HTTrack/"+url_htt+"index.html";
         File excelFile = new File(path_out_file);
         FileInputStream fis = new FileInputStream(excelFile);
 
@@ -187,10 +204,10 @@ public class GetContent extends DefaultJavaTestScript  {
         row.createCell(6).setCellValue(date_posts);
         row.createCell(7).setCellValue(sources);
         row.createCell(8).setCellValue(contents);
-                if(url_htt.length() <=0){
-            row.createCell(9).setCellValue(url_htt);
+        if(url_item.length() <= 0){
+            row.createCell(9).setCellValue(url_item);
         }else{
-            row.createCell(9).setCellValue(linkurl);
+            row.createCell(9).setCellValue(linkURL);
         }
 
         fis.close();

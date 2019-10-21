@@ -11,7 +11,13 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.text.*;
-
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
+import java.util.Date;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -125,16 +131,25 @@ public class GetContent extends DefaultJavaTestScript  {
   
   public void writeDataToFile(String path_out_file, String sheeName, String web_name, String url_web, String keyword, String url_item, String title, String date_posts, String sources, String contents){
     try{
-		String url_htt = "";
-		if(url_item.indexOf("https://") >= 0){
-			url_htt = url_item.replace("https://", "");
-		}else if(url_item.indexOf("http://") >= 0){
-			url_htt = url_item.replace("http://", "");
-		}
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		Date date = new Date();
-		String linkURL="https://"+"vp-web-crawl"+".s3-ap.com/"+ dateFormat.format(date) + "HTTrack/"+url_htt+"index.html";
-		String No = getContext().getVariableAsString("no_num");
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        
+        String str = formatter.format(date).toString();
+  
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateTime = LocalDate.parse(str, formatter1);
+        
+        String fridayString = dateTime.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).toString();
+        fridayString = fridayString.replace("-", "");
+        String url_htt = "";
+        if(url_item.indexOf("https://") >= 0){
+            url_htt = url_item.replace("https://", "");
+        }else if(url_item.indexOf("http://") >= 0){
+            url_htt = url_item.replace("http://", "");
+        }
+
+        String linkURL="https://s3.console.aws.amazon.com/s3/buckets/avatar-rpa-products/"+ fridayString + "HTTrack/"+url_htt+"index.html";
+        String No = getContext().getVariableAsString("no_num");
         File excelFile = new File(path_out_file);
         FileInputStream fis = new FileInputStream(excelFile);
 
